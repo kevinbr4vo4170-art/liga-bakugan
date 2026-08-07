@@ -1,0 +1,1489 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<title>Liga Bakugan · Cyber HUD</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Rajdhani:wght@400;500;600;700&display=swap');
+
+  :root {
+    --neon-cyan: #00f0ff;
+    --neon-magenta: #ff00aa;
+    --neon-purple: #b000ff;
+    --neon-green: #00ff9d;
+    --bg-dark: #0a0a12;
+    --panel: rgba(10, 15, 30, 0.85);
+    --border: rgba(0, 240, 255, 0.4);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Rajdhani', sans-serif;
+    background: var(--bg-dark);
+    color: #e0f7ff;
+    min-height: 100vh;
+    overflow-x: hidden;
+    position: relative;
+  }
+
+  /* ====== FONDO HEXAGONAL ANIMADO ====== */
+  .hex-bg {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    background:
+      radial-gradient(ellipse at 20% 30%, rgba(0, 240, 255, 0.08) 0%, transparent 50%),
+      radial-gradient(ellipse at 80% 70%, rgba(255, 0, 170, 0.07) 0%, transparent 50%),
+      #05050a;
+    overflow: hidden;
+  }
+  .hex-bg::before {
+    content: "";
+    position: absolute;
+    inset: -50%;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='56' viewBox='0 0 100 56'%3E%3Cpath d='M66 28L50 0L16 0L0 28L16 56L50 56L66 28L100 28' fill='none' stroke='%2300f0ff' stroke-opacity='0.12' stroke-width='1'/%3E%3Cpath d='M0 28L34 28L50 0L84 0L100 28L84 56L50 56L34 28' fill='none' stroke='%23ff00aa' stroke-opacity='0.08' stroke-width='1'/%3E%3C/svg%3E");
+    background-size: 100px 56px;
+    animation: hexMove 40s linear infinite;
+    opacity: 0.7;
+  }
+  @keyframes hexMove {
+    0% { transform: translate(0, 0); }
+    100% { transform: translate(-100px, -56px); }
+  }
+
+  /* ====== LAYOUT PRINCIPAL ====== */
+  .app {
+    position: relative;
+    z-index: 1;
+    max-width: 480px;
+    margin: 0 auto;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    padding-bottom: 70px;
+  }
+ 
+  /* HEADER */
+  header {
+    background: linear-gradient(180deg, rgba(0,20,40,0.95), transparent);
+    padding: 14px 16px 8px;
+    text-align: center;
+    border-bottom: 1px solid var(--border);
+    position: relative;
+  }
+
+  .admin-toggle-btn {
+    position: absolute;
+    top: 10px;
+    right: 12px;
+    background: rgba(0, 240, 255, 0.1);
+    border: 1px solid var(--border);
+    color: var(--neon-cyan);
+    border-radius: 6px;
+    padding: 4px 8px;
+    font-size: 0.65rem;
+    cursor: pointer;
+    font-family: 'Orbitron', sans-serif;
+    transition: 0.2s;
+  }
+  .admin-toggle-btn:hover {
+    background: rgba(0, 240, 255, 0.3);
+  }
+
+  .logo-title {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+  }
+
+  .logo-img {
+    width: auto;
+    height: 72px;
+    object-fit: contain;
+    filter: drop-shadow(0 0 6px #00f0ff) drop-shadow(0 0 12px #ff00aa);
+  }
+
+  header h1 {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1.15rem;
+    font-weight: 700;
+    letter-spacing: 2px;
+    background: linear-gradient(90deg, var(--neon-cyan), var(--neon-magenta));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    filter: drop-shadow(0 0 4px rgba(0,240,255,0.8)) drop-shadow(0 0 10px rgba(255,0,170,0.5));
+  }
+
+  .sub {
+    font-size: 0.7rem;
+    color: rgba(0,240,255,0.6);
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    text-shadow: 0 0 8px rgba(0,240,255,0.4);
+  }
+
+  /* TABS */
+  .tabs {
+    display: flex;
+    background: rgba(0,10,25,0.9);
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+  .tab-btn {
+    flex: 1;
+    padding: 12px 4px;
+    background: transparent;
+    border: none;
+    color: rgba(0,240,255,0.45);
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.65rem;
+    letter-spacing: 1px;
+    cursor: pointer;
+    position: relative;
+    transition: 0.25s;
+  }
+  .tab-btn.active {
+    color: var(--neon-cyan);
+    text-shadow: 0 0 10px var(--neon-cyan);
+  }
+  .tab-btn.active::after {
+    content: "";
+    position: absolute;
+    bottom: 0; left: 15%; right: 15%;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--neon-cyan), transparent);
+    box-shadow: 0 0 8px var(--neon-cyan);
+  }
+
+  /* CONTENIDO */
+  .content {
+    flex: 1;
+    padding: 16px;
+    overflow-y: auto;
+  }
+  .panel {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 14px;
+    box-shadow: 0 0 20px rgba(0,240,255,0.08), inset 0 0 30px rgba(0,0,0,0.3);
+    position: relative;
+    overflow: hidden;
+  }
+  .panel::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--neon-cyan), transparent);
+  }
+
+  /* PANEL ADMIN ESPECÍFICO */
+  .panel-admin {
+    border-color: var(--neon-magenta);
+    box-shadow: 0 0 20px rgba(255, 0, 170, 0.15);
+  }
+  .panel-admin::before {
+    background: linear-gradient(90deg, transparent, var(--neon-magenta), transparent);
+  }
+
+  /* FORMULARIOS */
+  label {
+    display: block;
+    font-size: 0.75rem;
+    color: var(--neon-cyan);
+    margin-bottom: 4px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+  input, select, textarea {
+    width: 100%;
+    background: rgba(0,20,40,0.7);
+    border: 1px solid rgba(0,240,255,0.25);
+    border-radius: 8px;
+    padding: 10px 12px;
+    color: #fff;
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 1rem;
+    margin-bottom: 12px;
+    outline: none;
+    transition: 0.2s;
+  }
+  input:focus, select:focus, textarea:focus {
+    border-color: var(--neon-cyan);
+    box-shadow: 0 0 12px rgba(0,240,255,0.25);
+  }
+
+  .btn {
+    display: inline-block;
+    width: 100%;
+    padding: 12px;
+    background: linear-gradient(135deg, rgba(0,240,255,0.2), rgba(255,0,170,0.15));
+    border: 1px solid var(--neon-cyan);
+    border-radius: 8px;
+    color: var(--neon-cyan);
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.8rem;
+    letter-spacing: 1.5px;
+    cursor: pointer;
+    transition: 0.25s;
+    text-align: center;
+  }
+  .btn:hover, .btn:active {
+    background: linear-gradient(135deg, rgba(0,240,255,0.35), rgba(255,0,170,0.25));
+    box-shadow: 0 0 18px rgba(0,240,255,0.35);
+  }
+  .btn-sm {
+    width: auto;
+    padding: 6px 12px;
+    font-size: 0.7rem;
+  }
+  .btn-danger {
+    border-color: #ff0055;
+    color: #ff4477;
+    background: rgba(255, 0, 85, 0.15);
+  }
+  .btn-danger:hover {
+    background: rgba(255, 0, 85, 0.35);
+    box-shadow: 0 0 15px rgba(255, 0, 85, 0.4);
+  }
+
+  /* PERSONAJE GUÍA */
+  #guide-character {
+    position: fixed;
+    bottom: 20px;
+    right: 16px;
+    z-index: 50;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 10px;
+    max-width: 280px;
+    pointer-events: none;
+  }
+  #guide-character.active {
+    pointer-events: auto;
+  }
+
+  .speech-bubble {
+    background: rgba(5,15,30,0.95);
+    border: 1px solid var(--neon-cyan);
+    border-radius: 12px 12px 0 12px;
+    padding: 10px 14px;
+    font-size: 0.85rem;
+    line-height: 1.35;
+    box-shadow: 0 0 15px rgba(0,240,255,0.2);
+    position: relative;
+    animation: fadeIn 0.4s ease;
+  }
+  .speech-bubble::after {
+    content: "";
+    position: absolute;
+    bottom: -8px; right: 18px;
+    border: 8px solid transparent;
+    border-top-color: var(--neon-cyan);
+    border-bottom: 0;
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ====== AVATAR HEXAGONAL EN PERFIL ====== */
+  .profile-avatar-hex-container {
+    position: relative;
+    width: 140px;
+    height: 120px;
+    margin: 0 auto;
+    filter: drop-shadow(0 0 12px #00f0ff);
+  }
+
+  .profile-avatar-hex-container::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: var(--neon-cyan);
+    clip-path: polygon(30% 0%, 70% 0%, 100% 50%, 70% 100%, 30% 100%, 0% 50%);
+    z-index: 1;
+  }
+
+  .player-avatar-hex {
+    position: absolute;
+    inset: 3px; 
+    width: calc(100% - 6px);
+    height: calc(100% - 6px);
+    object-fit: cover;
+    object-position: center;
+    background: rgba(10, 15, 30, 0.95);
+    clip-path: polygon(30% 0%, 70% 0%, 100% 50%, 70% 100%, 30% 100%, 0% 50%);
+    z-index: 2;
+  }
+
+  /* AVATAR DE LA GUÍA FLOTANTE */
+  .char-wrapper {
+    position: relative;
+    width: 130px;
+    height: 110px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    filter: drop-shadow(0 0 10px #00f0ff) drop-shadow(0 0 20px rgba(0, 240, 255, 0.5));
+  }
+
+  .char-wrapper::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: var(--neon-cyan);
+    clip-path: polygon(30% 0%, 70% 0%, 100% 50%, 70% 100%, 30% 100%, 0% 50%);
+    z-index: 1;
+  }
+
+  .char-img {
+    position: absolute;
+    inset: 3px; 
+    width: calc(100% - 6px);
+    height: calc(100% - 6px);
+    object-fit: contain;
+    object-position: center;
+    background: rgba(10, 15, 30, 0.95);
+    clip-path: polygon(30% 0%, 70% 0%, 100% 50%, 70% 100%, 30% 100%, 0% 50%);
+    z-index: 2;
+  }
+
+  .char-wrapper.mini {
+    width: 95px;
+    height: 80px;
+    filter: drop-shadow(0 0 8px #00f0ff) drop-shadow(0 0 16px rgba(0, 240, 255, 0.6));
+  }
+
+  .help-btn {
+    position: absolute;
+    top: -2px;
+    right: -2px;
+    background: var(--neon-magenta);
+    color: #fff;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 0 8px var(--neon-magenta);
+    z-index: 5;
+  }
+
+  /* RANKING Y ADMIN LIST */
+  .rank-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.85rem;
+  }
+  .rank-table th {
+    text-align: left;
+    padding: 8px 4px;
+    color: var(--neon-cyan);
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.65rem;
+    letter-spacing: 1px;
+    border-bottom: 1px solid var(--border);
+  }
+  .rank-table td {
+    padding: 10px 4px;
+    border-bottom: 1px solid rgba(0,240,255,0.1);
+    vertical-align: middle;
+  }
+  .rank-table tr:hover td {
+    background: rgba(0,240,255,0.05);
+  }
+  .player-avatar, .avatar-opt {
+    width: 48px;
+    height: 48px;
+    object-fit: cover;
+    clip-path: polygon(30% 0%, 70% 0%, 100% 50%, 70% 100%, 30% 100%, 0% 50%);
+    vertical-align: middle;
+  }
+  .rank-badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 0.65rem;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+  }
+  .rank-novato { background: #333; color: #aaa; }
+  .rank-bronce { background: #5c3a1e; color: #e0a060; }
+  .rank-plata  { background: #3a3a4a; color: #c0c0d0; }
+  .rank-oro    { background: #4a3a10; color: #ffd700; }
+  .rank-diamante { background: #0a3a4a; color: #00e5ff; }
+  .rank-rey    { background: linear-gradient(90deg,#4a0060,#8000ff); color: #ff00ff; box-shadow: 0 0 8px #ff00ff; }
+
+  /* ====== GLOSARIO ====== */
+  .glossary-item {
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid rgba(0,240,255,0.1);
+  }
+  .glossary-item h4 {
+    color: var(--neon-cyan);
+    text-shadow: 0 0 8px rgba(0, 240, 255, 0.6);
+    font-size: 0.95rem;
+    margin-bottom: 6px;
+    font-family: 'Orbitron', sans-serif;
+  }
+  .glossary-item p { 
+    font-size: 0.85rem; 
+    opacity: 0.85; 
+    margin-bottom: 8px;
+  }
+  .glossary-img {
+    width: 100%;
+    height: auto;
+    max-height: 220px;
+    object-fit: contain;
+    border-radius: 8px;
+    border: 1px solid rgba(0, 240, 255, 0.3);
+    margin-top: 8px;
+    background: rgba(0, 10, 25, 0.5);
+    box-shadow: 0 0 10px rgba(0, 240, 255, 0.1);
+  }
+
+  /* STATS */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin: 12px 0;
+  }
+  .stat-box {
+    background: rgba(0,30,50,0.6);
+    border: 1px solid rgba(0,240,255,0.2);
+    border-radius: 8px;
+    padding: 10px;
+    text-align: center;
+  }
+  .stat-box .num {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1.4rem;
+    color: var(--neon-cyan);
+  }
+  .stat-box .lbl {
+    font-size: 0.65rem;
+    color: rgba(0,240,255,0.6);
+    letter-spacing: 1px;
+  }
+
+  /* SECCIONES */
+  .section { display: none; }
+  .section.active { display: block; }
+
+  /* BIENVENIDA FULL */
+  #welcome-screen {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    background: rgba(5,5,15,0.97);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    text-align: center;
+  }
+  #welcome-screen.hidden { display: none; }
+
+  .welcome-char {
+    width: 140px;
+    height: 140px;
+    border-radius: 50%;
+    border: 3px solid var(--neon-magenta);
+    box-shadow: 0 0 40px rgba(255,0,170,0.5);
+    object-fit: cover;
+    margin-bottom: 20px;
+    background: #111;
+  }
+  .welcome-bubble {
+    background: rgba(10,20,40,0.95);
+    border: 1px solid var(--neon-cyan);
+    border-radius: 16px;
+    padding: 18px 20px;
+    max-width: 340px;
+    margin-bottom: 24px;
+    font-size: 1rem;
+    line-height: 1.45;
+    position: relative;
+  }
+  .welcome-bubble::after {
+    content: "";
+    position: absolute;
+    top: -10px; left: 50%;
+    transform: translateX(-50%);
+    border: 10px solid transparent;
+    border-bottom-color: var(--neon-cyan);
+  }
+
+  /* AVATARS EN SELECCIÓN */
+  .avatar-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 16px;
+    min-height: 50px;
+  }
+  .avatar-opt {
+    width: 48px; 
+    height: 48px;
+    border: 2px solid transparent;
+    cursor: pointer;
+    object-fit: cover;
+    transition: 0.2s;
+  }
+  .avatar-opt.selected {
+    filter: drop-shadow(0 0 6px var(--neon-cyan));
+    border-color: var(--neon-cyan);
+    transform: scale(1.1);
+  }
+
+  @media (min-width: 500px) {
+    .app { max-width: 520px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- FONDO ANIMADO -->
+<div class="hex-bg"></div>
+
+<!-- ============ PANTALLA DE BIENVENIDA ============ -->
+<div id="welcome-screen">
+  <img src="Lady_fenne_04.png" alt="Guía" class="welcome-char" id="welcome-char-img"
+       onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Ccircle cx=%2250%22 cy=%2250%22 r=%2248%22 fill=%22%23111%22 stroke=%22%23ff00aa%22 stroke-width=%223%22/%3E%3Ctext x=%2250%22 y=%2258%22 text-anchor=%22middle%22 fill=%22%23ff00aa%22 font-size=%2230%22%3E?%3C/text%3E%3C/svg%3E'">
+
+  <div class="welcome-bubble" id="welcome-text">
+    ¡Bienvenido Brawler a la <strong>Liga Bakugan</strong>!<br><br>
+    Por favor indica tu <strong>nombre o Nick-name</strong> para comenzar.
+  </div>
+
+  <div style="width:100%; max-width:300px;">
+    <input type="text" id="nick-input" placeholder="Tu Nick-name..." maxlength="20" />
+    <button class="btn" onclick="startRegistration()">ENTRAR A LA LIGA</button>
+  </div>
+</div>
+
+<!-- ============ APP PRINCIPAL ============ -->
+<div class="app" id="main-app" style="display:none;">
+
+  <header>
+    <button class="admin-toggle-btn" onclick="promptAdminAccess()">⚙️ ADMIN</button>
+    <div class="logo-title">
+      <img src="LOGO-BAKUGAN.png" alt="Bakugan" class="logo-img" onerror="this.style.display='none'">
+      <div>
+        <h1>LIGA BAKUGAN</h1>
+        <div class="sub">Arena the Brawlers · TCG</div>
+      </div>
+    </div>
+  </header>
+
+  <div class="tabs">
+    <button class="tab-btn active" data-tab="perfil">PERFIL</button>
+    <button class="tab-btn" data-tab="liga">LIGA</button>
+    <button class="tab-btn" data-tab="glosario">GLOSARIO</button>
+    <button class="tab-btn" id="tab-admin-btn" data-tab="admin" style="display:none; color: var(--neon-magenta);">ADMIN</button>
+  </div>
+
+  <div class="content">
+
+    <!-- ===== PERFIL ===== -->
+    <div class="section active" id="sec-perfil">
+      <div class="panel">
+        <h3 style="font-family:'Orbitron';color:var(--neon-cyan);margin-bottom:12px;font-size:0.9rem;">MI PERFIL</h3>
+
+        <div style="text-align:center;margin-bottom:16px;">
+          <div class="profile-avatar-hex-container">
+            <img id="profile-avatar" src="dragonoid_diamante_icon.jpg" class="player-avatar-hex" alt="Avatar" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Crect width=%22100%22 height=%22100%22 fill=%22%230a0f1e%22/%3E%3Ctext x=%2250%22 y=%2255%22 fill=%22%2300f0ff%22 font-size=%2212%22 text-anchor=%22middle%22%3EAVATAR%3C/text%3E%3C/svg%3E'">
+          </div>
+          
+          <div id="profile-nick-display" style="font-family:'Orbitron';font-size:1.2rem;margin-top:10px;color:var(--neon-cyan);">Cargando...</div>
+          <div id="profile-id" style="font-size:0.75rem;color:rgba(0,240,255,0.6);">---</div>
+        </div>
+
+        <label for="nick-edit-input">Nick-Name (Modificable)</label>
+        <input type="text" id="nick-edit-input" placeholder="Tu Nickname..." maxlength="20" />
+
+        <label for="contact-input">Contacto (Gmail o Teléfono)</label>
+        <input type="text" id="contact-input" placeholder="ejemplo@mail.com o +54..." />
+
+        <label for="faction-select">Facciones preferidas</label>
+        <select id="faction-select" multiple style="height:80px;">
+          <option value="Pyrus">Pyrus</option>
+          <option value="Aquos">Aquos</option>
+          <option value="Ventus">Ventus</option>
+          <option value="Aurelus">Aurelus</option>
+          <option value="Haos">Haos</option>
+          <option value="Darkus">Darkus</option>
+        </select>
+
+        <label>Avatar (elige uno)</label>
+        <div class="avatar-grid" id="avatar-grid"></div>
+
+        <label>Tus 3 Bakugan de equipo (Team Main)</label>
+        <input type="text" id="baku1" placeholder="Bakugan 1" />
+        <input type="text" id="baku2" placeholder="Bakugan 2" />
+        <input type="text" id="baku3" placeholder="Bakugan 3" />
+
+        <button class="btn" onclick="saveProfile()">GUARDAR PERFIL</button>
+      </div>
+
+      <div class="panel">
+        <h3 style="font-family:'Orbitron';color:var(--neon-cyan);margin-bottom:10px;font-size:0.85rem;">MIS ESTADÍSTICAS</h3>
+        <div class="stats-grid">
+          <div class="stat-box"><div class="num" id="stat-points">0</div><div class="lbl">PUNTOS</div></div>
+          <div class="stat-box"><div class="num" id="stat-rank">NOVATO</div><div class="lbl">RANGO</div></div>
+          <div class="stat-box"><div class="num" id="stat-wins">0</div><div class="lbl">VICTORIAS</div></div>
+          <div class="stat-box"><div class="num" id="stat-losses">0</div><div class="lbl">DERROTAS</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== LIGA ===== -->
+    <div class="section" id="sec-liga">
+      <div class="panel">
+        <h3 style="font-family:'Orbitron';color:var(--neon-cyan);margin-bottom:12px;font-size:0.9rem;">RANKING DE LA LIGA</h3>
+        <div style="overflow-x:auto;">
+          <table class="rank-table">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th></th>
+                <th>NICK</th>
+                <th>PUNTOS</th>
+                <th>V/D</th>
+                <th>RANGO</th>
+              </tr>
+            </thead>
+            <tbody id="rank-body"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h3 style="font-family:'Orbitron';color:var(--neon-cyan);margin-bottom:8px;font-size:0.85rem;">SISTEMA DE PUNTOS</h3>
+        <p style="font-size:0.85rem;opacity:0.8;line-height:1.5;">
+          • Cada <strong>victoria</strong> suma <span style="color:var(--neon-green)">+50</span> puntos<br>
+          • Cada <strong>derrota</strong> resta <span style="color:#ff4466">-25</span> puntos<br><br>
+          <strong>Rangos:</strong><br>
+          0–199 → Novato<br>
+          200–499 → Bronce<br>
+          500–999 → Plata<br>
+          1000–1599 → Oro<br>
+          1600–3499 → Diamante<br>
+          3500+ → <span style="color:#ff00ff">Rey de Batallas</span>
+        </p>
+      </div>
+    </div>
+
+    <!-- ===== GLOSARIO ===== -->
+    <div class="section" id="sec-glosario">
+      <div class="panel">
+        <h3 style="font-family:'Orbitron';color:var(--neon-cyan);margin-bottom:14px;font-size:0.9rem;">GLOSARIO TCG</h3>
+
+        <h4 style="color:var(--neon-magenta); font-family:'Orbitron'; margin: 15px 0 10px 0; font-size: 0.85rem; border-bottom: 1px solid var(--neon-magenta); padding-bottom: 4px;">BASES DEL JUEGO</h4>
+
+        <div class="glossary-item">
+          <h4>Matrix o Campo</h4>
+          <p>Es donde se lanzan los Bakugan para pelear. Está conformada por los 12 BakuCore (6 de cada jugador correspondientes a sus Bakugan).</p>
+          <img src="brawler.jpg" class="glossary-img" alt="Matrix o Campo" onerror="this.style.display='none'">
+        </div>
+
+        <div class="glossary-item">
+          <h4>Bakugan</h4>
+          <p>Criaturas esféricas que se abren en el campo de batalla. Cada uno tiene una Facción (Pyrus, Aquos, etc.), posee dos estadísticas (B-Power y Daño) y se debe jugar con sus BakuCores correspondientes.</p>
+          <img src="bakugan.jpg" class="glossary-img" alt="Bakugan" onerror="this.style.display='none'">
+        </div>
+
+        <div class="glossary-item">
+          <h4>B-Power</h4>
+          <p>Representa la energía de combate o fuerza del Bakugan. Quien logre el B-Power más alto durante la batalla gana la ronda.</p>
+          <img src="simbolo_bpower.png" class="glossary-img" alt="B-Power" onerror="this.style.display='none'">
+        </div>
+
+        <div class="glossary-item">
+          <h4>Daño</h4>
+          <p>Indica la cantidad de cartas que el oponente debe retirar/descartar de su mazo si tu Bakugan gana el combate.</p>
+          <img src="simbolo_dano.png" class="glossary-img" alt="Daño" onerror="this.style.display='none'">
+        </div>
+
+        <div class="glossary-item">
+          <h4>Carta Personaje</h4>
+          <p>Muestra las estadísticas base (B-Power y Daño), la facción y los BakuCores requeridos de tu Bakugan.</p>
+          <img src="carta_personaje.png" class="glossary-img" alt="Carta Personaje" onerror="this.style.display='none'">
+        </div>
+
+        <div class="glossary-item">
+          <h4>Carta Acción</h4>
+          <p>Cartas que juegas pagando Energía para potenciar estadísticas, modificar el campo o cambiar el curso del combate.</p>
+          <img src="carta_accion.png" class="glossary-img" alt="Carta Acción" onerror="this.style.display='none'">
+        </div>
+
+        <div class="glossary-item">
+          <h4>Carta Héroe</h4>
+          <p>Se quedan en el campo una vez jugadas y otorgan efectos pasivos o habilidades continuas durante toda la partida.</p>
+          <img src="carta_heroe.png" class="glossary-img" alt="Carta Héroe" onerror="this.style.display='none'">
+        </div>
+
+        <div class="glossary-item">
+          <h4>Carta Flip</h4>
+          <p>Cartas defensivas que se activan inmediatamente cuando recibes daño del mazo para detener ataques o contraatacar.</p>
+          <img src="carta_flip.png" class="glossary-img" alt="Carta Flip" onerror="this.style.display='none'">
+        </div>
+
+        <div class="glossary-item">
+          <h4>Carta Evo</h4>
+          <p>Evoluciones que colocas sobre una Carta de Personaje activa para aumentar drásticamente sus estadísticas y ganar nuevas habilidades.</p>
+          <img src="carta_evo.png" class="glossary-img" alt="Carta Evo" onerror="this.style.display='none'">
+        </div>
+
+        <div class="glossary-item">
+          <h4>Carta Gear</h4>
+          <p>Equipamiento o armamento (Baku-Gear) que sumas a tus Bakugan pagando su coste en energía para potenciar tus ataques.</p>
+          <img src="carta_gear.png" class="glossary-img" alt="Carta Gear" onerror="this.style.display='none'">
+        </div>
+
+        <h4 style="color:var(--neon-magenta); font-family:'Orbitron'; margin: 20px 0 10px 0; font-size: 0.85rem; border-bottom: 1px solid var(--neon-magenta); padding-bottom: 4px;">TIPOS DE BAKUCORE</h4>
+
+        <div class="glossary-item">
+          <h4>Shield Core</h4>
+          <p>shield(Escudo Naranja): Un Bakucore centrado en otorgar B-Power. Las variantes que otorgan la mayor cantidad de esta estadística suelen incluir restricciones de Facción, mientras que los cores orientados a debuff reducen B-Power de forma general sin condiciones de atributo.</p>
+          <img src="core_shield.png" class="glossary-img" alt="Shield Core" onerror="this.style.display='none'">
+        </div>
+
+        <div class="glossary-item">
+          <h4>Magic Shield Core</h4>
+          <p>Magic Shield(Escudo Magico): Es el Bakucore con los bonos de B-Power más altos del juego. Suele requerir condiciones específicas para aprovechar su potencial, como ser utilizado por Bakugan Fusión, o bien ofrecer reducción de coste para Baku-Gears.</p>
+          <img src="core_magic_shield.png" class="glossary-img" alt="Magic Shield Core" onerror="this.style.display='none'">
+        </div>
+
+        <div class="glossary-item">
+          <h4>Fist Core</h4>
+          <p>Fist (Puño Verde): Es un Bakucore orientado a variaciones leves de estadísticas. Sus valores base de B-Power y Daño suelen ser bajos, pero aporta beneficios o buffs específicos para ciertas facciones.</p>
+          <img src="core_fist.png" class="glossary-img" alt="Fist Core" onerror="this.style.display='none'">
+        </div>
+
+        <div class="glossary-item">
+          <h4>Fire Fist Core</h4>
+          <p>Fire Fist (Puño Rojo o Puño de Fuego): Funciona como una variante más agresiva del Fist, ofreciendo mayores incrementos en Daño o B-Power.</p>
+          <img src="core_fire_fist.png" class="glossary-img" alt="Fire Fist Core" onerror="this.style.display='none'">
+        </div>
+
+        <div class="glossary-item">
+          <h4>Helix Core</h4>
+          <p>Helix (Helice): Se caracteriza por modificar estadísticas mediante compensación (aumenta un parámetro y reduce otro).</p>
+          <img src="core_helix.png" class="glossary-img" alt="Helix Core" onerror="this.style.display='none'">
+        </div>
+
+        <h4 style="color:var(--neon-magenta); font-family:'Orbitron'; margin: 20px 0 10px 0; font-size: 0.85rem; border-bottom: 1px solid var(--neon-magenta); padding-bottom: 4px;">MECÁNICAS STRIKE</h4>
+
+        <div class="glossary-item">
+          <h4>FrostStrike</h4>
+          <p>Establece un coste de energía adicional que el oponente debe pagar si desea jugar cartas Flip para detener o negar el daño tras la fase de cálculo.</p>
+          <img src="strike_frost.png" class="glossary-img" alt="FrostStrike" onerror="this.style.display='none'">
+        </div>
+
+        <div class="glossary-item">
+          <h4>ShadowStrike</h4>
+          <p>Otorga inmunidad total contra reducciones de estadísticas por parte de cartas de habilidad, Bakucores o efectos del oponente durante el combate.</p>
+          <img src="strike_shadow.png" class="glossary-img" alt="ShadowStrike" onerror="this.style.display='none'">
+        </div>
+
+        <div class="glossary-item">
+          <h4>DobleStrike</h4>
+          <p>Es un multiplicador de impacto directo. Multiplica por dos (2x) el daño total generado por el Bakugan antes de aplicarlo al rival.</p>
+          <img src="strike_double.png" class="glossary-img" alt="DobleStrike" onerror="this.style.display='none'">
+        </div>
+
+        <h4 style="color:var(--neon-magenta); font-family:'Orbitron'; margin: 20px 0 10px 0; font-size: 0.85rem; border-bottom: 1px solid var(--neon-magenta); padding-bottom: 4px;">SÍMBOLOS Y EFECTOS</h4>
+
+        <div class="glossary-item">
+          <h4>Reroll</h4>
+          <p>Otorga la posibilidad de volver a lanzar tu Bakugan durante el turno en curso si el lanzamiento inicial fue fallido.</p>
+          <img src="logo_reroll.png" class="glossary-img" alt="Reroll" onerror="this.style.display='none'">
+        </div>
+
+        <div class="glossary-item">
+          <h4>Negar Core</h4>
+          <p>Anula completamente el BakuCore obtenido por el rival en esa ronda, cancelando tanto sus valores de B-Power/Daño como cualquier efecto secundario.</p>
+          <img src="logo_negar_core.png" class="glossary-img" alt="Negar Core" onerror="this.style.display='none'">
+        </div>
+
+        <div class="glossary-item">
+          <h4>Sumar Core</h4>
+          <p>Permite tomar un BakuCore adicional directamente desde la Matrix y equiparlo a tu Bakugan activo.</p>
+          <img src="logo_sumar_core.png" class="glossary-img" alt="Sumar Core" onerror="this.style.display='none'">
+        </div>
+
+        <div class="glossary-item">
+          <h4>Robar Core</h4>
+          <p>Retira el BakuCore que el rival haya reclamado en ese turno y lo transfiere a tu propio Bakugan activo.</p>
+          <img src="logo_robar_core.png" class="glossary-img" alt="Robar Core" onerror="this.style.display='none'">
+        </div>
+
+        <div class="glossary-item">
+          <h4>Energía</h4>
+          <p>Representa el coste en puntos de energía necesarios para jugar las cartas de tu mano.</p>
+          <img src="logo_energia.png" class="glossary-img" alt="Energía" onerror="this.style.display='none'">
+        </div>
+
+        <div class="glossary-item">
+          <h4>Baku-Gear</h4>
+          <p>Identifica a las cartas de equipamiento o armamento. Otorga una reducción de -2 de energía al coste de jugar un Baku-Gear.</p>
+          <img src="logo_bakugear.png" class="glossary-img" alt="Baku-Gear" onerror="this.style.display='none'">
+        </div>
+
+        <div class="glossary-item">
+          <h4>Doble Baku-Gear</h4>
+          <p>Indica que dicha carta puede equiparse como un segundo Baku-Gear en un mismo Bakugan.</p>
+          <img src="logo_doble_bakugear.png" class="glossary-img" alt="Doble Baku-Gear" onerror="this.style.display='none'">
+        </div>
+
+        <div class="glossary-item">
+          <h4>Stop</h4>
+          <p>Permite frenar y cancelar el ataque en curso del oponente tras la fase de cálculo de daño.</p>
+          <img src="logo_stop.png" class="glossary-img" alt="Stop" onerror="this.style.display='none'">
+        </div>
+
+        <div class="glossary-item">
+          <h4>Fusión</h4>
+          <p>Permite voltear la carta del Bakugan para transformarlo en su versión Fusionada, acquiring nuevas estadísticas.</p>
+          <img src="logo_fusion.png" class="glossary-img" alt="Fusión" onerror="this.style.display='none'">
+        </div>
+
+        <div class="glossary-item">
+          <h4>Team Attack</h4>
+          <p>Permite ejecutar un ataque combinado sumando el Daño total de tus tres Bakugan en un solo impacto.</p>
+          <img src="logo_team_attack.png" class="glossary-img" alt="Team Attack" onerror="this.style.display='none'">
+        </div>
+
+        <div class="glossary-item">
+          <h4>Victor</h4>
+          <p>Se activa únicamente si tu Bakugan se declara ganador de la ronda, desencadenando los efectos que acompañen a este icono.</p>
+          <img src="logo_victor.png" class="glossary-img" alt="Victor" onerror="this.style.display='none'">
+        </div>
+
+        <div class="glossary-item">
+          <h4>Evolución Diamante</h4>
+          <p>Identifica que la carta pertenece a la línea evolutiva de un Bakugan de variante Diamante.</p>
+          <img src="logo_diamante.png" class="glossary-img" alt="Evolución Diamante" onerror="this.style.display='none'">
+        </div>
+
+        <div class="glossary-item">
+          <h4>Escanear (Scan)</h4>
+          <p>Permite mirar la carta superior de tu Deck. Tras revisarla, puedes dejarla arriba o enviarla al fondo.</p>
+          <img src="logo_escanear.png" class="glossary-img" alt="Escanear" onerror="this.style.display='none'">
+        </div>
+
+        <div class="glossary-item">
+          <h4>Robar Carta</h4>
+          <p>Representa la acción de tomar cartas directamente del tope de tu Deck.</p>
+          <img src="logo_robar_carta.png" class="glossary-img" alt="Robar Carta" onerror="this.style.display='none'">
+        </div>
+
+        <h4 style="color:var(--neon-magenta); font-family:'Orbitron'; margin: 20px 0 10px 0; font-size: 0.85rem; border-bottom: 1px solid var(--neon-magenta); padding-bottom: 4px;">FACCIONES</h4>
+
+        <div class="glossary-item">
+          <h4>Pyrus</h4>
+          <p>Rápido, agresivo y explosivo. Genera energía adicional y aplica daño masivo al rival.</p>
+          <img src="faccion_pyrus.png" class="glossary-img" alt="Pyrus" onerror="this.style.display='none'">
+        </div>
+
+        <div class="glossary-item">
+          <h4>Aquos</h4>
+          <p>Táctico y de interrupción. Manipula a los Bakugan rivales y niega o anula jugadas.</p>
+          <img src="faccion_aquos.png" class="glossary-img" alt="Aquos" onerror="this.style.display='none'">
+        </div>
+
+        <div class="glossary-item">
+          <h4>Ventus</h4>
+          <p>Control de energía y manipulación. Genera recursos rápidamente y debilita (debuff) al rival.</p>
+          <img src="faccion_ventus.png" class="glossary-img" alt="Ventus" onerror="this.style.display='none'">
+        </div>
+
+        <div class="glossary-item">
+          <h4>Aurelus</h4>
+          <p>Versatilidad. Bakugan con altas estadísticas base sin requerir muchas cartas de su propia facción.</p>
+          <img src="faccion_aurelus.png" class="glossary-img" alt="Aurelus" onerror="this.style.display='none'">
+        </div>
+
+        <div class="glossary-item">
+          <h4>Haos</h4>
+          <p>Control, precisión y Dominio. Se potencia según la cantidad de BakuCores y Héroes en juego.</p>
+          <img src="faccion_haos.png" class="glossary-img" alt="Haos" onerror="this.style.display='none'">
+        </div>
+
+        <div class="glossary-item">
+          <h4>Darkus</h4>
+          <p>Riesgo y recompensa. Descarta cartas para efectos poderosos y controla la mano rival.</p>
+          <img src="faccion_darkus.png" class="glossary-img" alt="Darkus" onerror="this.style.display='none'">
+        </div>
+
+        <div class="glossary-item">
+          <h4>All-Faction</h4>
+          <p>Cualquier Bakugan de esta facción sirve para reemplazar cualquier facción para completar un equipo.</p>
+          <img src="faccion_all-faction.png" class="glossary-img" alt="All-Faction" onerror="this.style.display='none'">
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ===== SECCIÓN ADMINISTRADOR ===== -->
+    <div class="section" id="sec-admin">
+      <div class="panel panel-admin">
+        <h3 style="font-family:'Orbitron';color:var(--neon-magenta);margin-bottom:12px;font-size:0.9rem;">PANEL DE CONTROL (GAME MASTER)</h3>
+        <p style="font-size:0.8rem; opacity:0.8; margin-bottom:12px;">Administra los resultados de las partidas y el estado general de la liga.</p>
+        
+        <div style="overflow-x:auto;">
+          <table class="rank-table">
+            <thead>
+              <tr>
+                <th>JUGADOR</th>
+                <th>V / D</th>
+                <th>PUNTOS</th>
+                <th>ACCIONES</th>
+              </tr>
+            </thead>
+            <tbody id="admin-players-body"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="panel panel-admin" style="text-align:center;">
+        <h3 style="font-family:'Orbitron';color:#ff0055;margin-bottom:8px;font-size:0.85rem;">REINICIO DE TEMPORADA</h3>
+        <p style="font-size:0.8rem; opacity:0.75; margin-bottom:12px;">Esta acción pondrá a <strong>0</strong> las victorias, derrotas y puntos de TODOS los jugadores registrados. Los usuarios conservarán sus perfiles.</p>
+        <button class="btn btn-danger" onclick="resetSeason()">⚠️ REINICIAR PUNTOS DE LA LIGA</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- PERSONAJE GUÍA FLOTANTE -->
+<div id="guide-character" class="active">
+  <div class="speech-bubble" id="guide-bubble" style="display:none;"></div>
+  <div style="position:relative;">
+    <div class="char-wrapper" id="char-box" onclick="toggleGuideHelp()">
+      <img src="Lady_fenne_04.png" class="char-img" id="guide-img" alt="Guía Mascot">
+    </div>
+    <div class="help-btn" id="help-btn" style="display:none;" onclick="toggleGuideHelp()">?</div>
+  </div>
+</div>
+
+<!-- =====================================================
+     FIREBASE SDK (VERSION COMPAT)
+===================================================== -->
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+
+<script>
+/* =====================================================
+   CONFIGURACIÓN Y CONEXIÓN DE FIREBASE
+   (REEMPLAZA LOS DATOS CON TUS PROPIAS CLAVES DE FIREBASE)
+===================================================== */
+const firebaseConfig = {
+  apiKey: "TU_API_KEY_AQUI",
+  authDomain: "tu-proyecto.firebaseapp.com",
+  projectId: "tu-proyecto-id",
+  storageBucket: "tu-proyecto.appspot.com",
+  messagingSenderId: "123456789",
+  appId: "1:123456789:web:abcdef123456"
+};
+
+// Inicializar Firebase
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+
+/* =====================================================
+   DATOS Y UTILIDADES
+===================================================== */
+const ADMIN_PIN = '4170';
+
+const AVATARS = [
+  'dragonoid_diamante_icon.jpg',
+  'Cyndeous_sworld_icon.jpg',
+  'Cyndeous_icon.jpg',
+  'fangzor_mantonoid_icon.jpg',
+  'dragonoid_flame_icon.jpg',
+  'Fenneca_icon.jpg',
+  'trox_icon.jpg',
+  'hydranoid_icon.jpg',
+  'mantonoid_icon.jpg',
+  'platinum_pharol_icon.jpg',
+  'wrath_diamont_icon.jpg',
+  'serpillious_icon.jpg'
+];
+
+const GUIDE_POSES = [
+  'Lady_fenne_04.png',
+  'Lady_fenne_01.png',
+  'Lady_fenne_01.png',
+  'Lady_fenne_02.png',
+  'Lady_fenne_01.png',
+  'Lady_fenne_03.png'
+];
+
+const GUIDE_MINI = 'Lady_fenne_icono.png'; 
+
+let currentUserId = localStorage.getItem('bakugan_my_user_id') || null;
+let selectedAvatarPath = AVATARS[0];
+let players = [];
+let guideStep = 0;
+let guideFinished = false;
+let isAdminMode = false;
+
+// Escuchar cambios en la base de datos de Firebase en tiempo real
+function listenToDatabase() {
+  db.collection("players").onSnapshot((snapshot) => {
+    players = [];
+    snapshot.forEach((doc) => {
+      players.push(doc.data());
+    });
+
+    renderRanking();
+    if (currentUserId) {
+      renderProfile();
+    }
+    if (isAdminMode) {
+      renderAdminPanel();
+    }
+  }, (error) => {
+    console.error("Error al escuchar Firestore: ", error);
+  });
+}
+
+function saveUserToCloud(user) {
+  return db.collection("players").doc(user.id).set(user);
+}
+
+function recalculatePoints(player) {
+  const pts = ((player.wins || 0) * 50) - ((player.losses || 0) * 25);
+  player.points = Math.max(0, pts);
+}
+
+function getRank(points) {
+  if (points >= 3500) return { name: 'Rey de Batallas', cls: 'rank-rey' };
+  if (points >= 1600) return { name: 'Diamante', cls: 'rank-diamante' };
+  if (points >= 1000) return { name: 'Oro', cls: 'rank-oro' };
+  if (points >= 500)  return { name: 'Plata', cls: 'rank-plata' };
+  if (points >= 200)  return { name: 'Bronce', cls: 'rank-bronce' };
+  return { name: 'Novato', cls: 'rank-novato' };
+}
+
+function generateId() {
+  return 'BK-' + Math.random().toString(36).substr(2, 6).toUpperCase();
+}
+
+/* =====================================================
+   CONSTRUCCIÓN DEL GRID DE AVATARES
+===================================================== */
+function buildAvatarGrid() {
+  const grid = document.getElementById('avatar-grid');
+  if (!grid) return;
+  grid.innerHTML = '';
+
+  AVATARS.forEach((src) => {
+    const img = document.createElement('img');
+    img.src = src;
+    img.className = 'avatar-opt' + (selectedAvatarPath === src ? ' selected' : '');
+    img.onerror = function() {
+      this.src = 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Crect width=%22100%22 height=%22100%22 fill=%22%23112233%22/%3E%3Ctext x=%2250%22 y=%2255%22 fill=%22%2300f0ff%22 font-size=%2214%22 text-anchor=%22middle%22%3EBK%3C/text%3E%3C/svg%3E';
+    };
+    img.onclick = () => {
+      document.querySelectorAll('.avatar-opt').forEach(a => a.classList.remove('selected'));
+      img.classList.add('selected');
+      selectedAvatarPath = src;
+      
+      const profileImg = document.getElementById('profile-avatar');
+      if (profileImg) profileImg.src = src;
+    };
+    grid.appendChild(img);
+  });
+}
+
+/* =====================================================
+   REGISTRO / BIENVENIDA
+===================================================== */
+async function startRegistration() {
+  const nick = document.getElementById('nick-input').value.trim();
+  if (!nick) {
+    alert('¡Escribe tu Nick-name!');
+    return;
+  }
+
+  // Buscar si ya existe este nickname en Firebase
+  let user = players.find(p => p.nick && p.nick.toLowerCase() === nick.toLowerCase());
+  if (!user) {
+    user = {
+      id: generateId(),
+      nick: nick,
+      contact: '',
+      factions: [],
+      avatar: selectedAvatarPath || AVATARS[0],
+      bakugan: ['', '', ''],
+      wins: 0,
+      losses: 0,
+      points: 0
+    };
+    await saveUserToCloud(user);
+  }
+
+  currentUserId = user.id;
+  localStorage.setItem('bakugan_my_user_id', currentUserId);
+  enterApp();
+}
+
+function enterApp() {
+  document.getElementById('welcome-screen').classList.add('hidden');
+  document.getElementById('main-app').style.display = 'flex';
+  buildAvatarGrid();
+  renderProfile();
+  renderRanking();
+  startGuide();
+}
+
+/* =====================================================
+   PERFIL
+===================================================== */
+function renderProfile() {
+  let user = players.find(p => p.id === currentUserId);
+  if (!user) {
+    user = {
+      id: currentUserId || generateId(),
+      nick: 'Brawler',
+      avatar: AVATARS[0],
+      points: 0, wins: 0, losses: 0, bakugan: ['','','']
+    };
+  }
+
+  selectedAvatarPath = user.avatar || AVATARS[0];
+  
+  const profileAvatar = document.getElementById('profile-avatar');
+  if (profileAvatar) profileAvatar.src = selectedAvatarPath;
+
+  document.getElementById('profile-nick-display').textContent = user.nick || 'Brawler';
+  document.getElementById('nick-edit-input').value = user.nick || '';
+  document.getElementById('profile-id').textContent = 'ID: ' + (user.id || '---');
+  document.getElementById('contact-input').value = user.contact || '';
+
+  const sel = document.getElementById('faction-select');
+  if (sel) {
+    Array.from(sel.options).forEach(opt => {
+      opt.selected = (user.factions || []).includes(opt.value);
+    });
+  }
+
+  const baku = user.bakugan || ['', '', ''];
+  document.getElementById('baku1').value = baku[0] || '';
+  document.getElementById('baku2').value = baku[1] || '';
+  document.getElementById('baku3').value = baku[2] || '';
+
+  const rank = getRank(user.points || 0);
+  document.getElementById('stat-points').textContent = user.points || 0;
+  document.getElementById('stat-rank').textContent = rank.name;
+  document.getElementById('stat-wins').textContent = user.wins || 0;
+  document.getElementById('stat-losses').textContent = user.losses || 0;
+
+  buildAvatarGrid();
+}
+
+async function saveProfile() {
+  let user = players.find(p => p.id === currentUserId);
+  if (!user) {
+    user = { id: currentUserId || generateId(), wins: 0, losses: 0, points: 0 };
+  }
+
+  const newNick = document.getElementById('nick-edit-input').value.trim();
+  if (!newNick) {
+    alert('El Nickname no puede quedar vacío.');
+    return;
+  }
+
+  user.nick = newNick;
+  user.contact = document.getElementById('contact-input').value.trim();
+  user.avatar = selectedAvatarPath;
+
+  const sel = document.getElementById('faction-select');
+  user.factions = Array.from(sel.selectedOptions).map(o => o.value);
+  
+  user.bakugan = [
+    document.getElementById('baku1').value.trim(),
+    document.getElementById('baku2').value.trim(),
+    document.getElementById('baku3').value.trim()
+  ];
+
+  await saveUserToCloud(user);
+  showGuideMessage('¡Perfil actualizado en la nube, Brawler!');
+}
+
+/* =====================================================
+   RANKING
+===================================================== */
+function renderRanking() {
+  const tbody = document.getElementById('rank-body');
+  if (!tbody) return;
+
+  const sorted = [...players].sort((a, b) => (b.points || 0) - (a.points || 0));
+  tbody.innerHTML = '';
+
+  sorted.forEach((p, i) => {
+    const rank = getRank(p.points || 0);
+    const tr = document.createElement('tr');
+
+    const td1 = document.createElement('td');
+    td1.textContent = i + 1;
+    tr.appendChild(td1);
+
+    const td2 = document.createElement('td');
+    const img = document.createElement('img');
+    img.src = p.avatar || AVATARS[0];
+    img.className = 'player-avatar';
+    img.onerror = function() {
+      this.src = 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Crect width=%22100%22 height=%22100%22 fill=%22%23112233%22/%3E%3C/svg%3E';
+    };
+    td2.appendChild(img);
+    tr.appendChild(td2);
+
+    const td3 = document.createElement('td');
+    td3.innerHTML = (p.nick || 'Brawler') + '<br><small style="opacity:0.5">' + p.id + '</small>';
+    tr.appendChild(td3);
+
+    const td4 = document.createElement('td');
+    td4.style.color = 'var(--neon-cyan)';
+    td4.style.fontWeight = '600';
+    td4.textContent = p.points || 0;
+    tr.appendChild(td4);
+
+    const td5 = document.createElement('td');
+    td5.textContent = (p.wins || 0) + '/' + (p.losses || 0);
+    tr.appendChild(td5);
+
+    const td6 = document.createElement('td');
+    const span = document.createElement('span');
+    span.className = 'rank-badge ' + rank.cls;
+    span.textContent = rank.name;
+    td6.appendChild(span);
+    tr.appendChild(td6);
+
+    tbody.appendChild(tr);
+  });
+}
+
+/* =====================================================
+   SISTEMA ADMINISTRADOR
+===================================================== */
+function promptAdminAccess() {
+  if (isAdminMode) {
+    alert('Ya te encuentras en Modo Administrador.');
+    switchTab('admin');
+    return;
+  }
+
+  const pass = prompt('Ingrese el PIN de ADMINISTRADOR:');
+  if (pass === ADMIN_PIN) {
+    isAdminMode = true;
+    document.getElementById('tab-admin-btn').style.display = 'block';
+    renderAdminPanel();
+    switchTab('admin');
+    alert('¡Modo Game Master Activado!');
+  } else if (pass !== null) {
+    alert('PIN incorrecto. Acceso denegado.');
+  }
+}
+
+function renderAdminPanel() {
+  const tbody = document.getElementById('admin-players-body');
+  if (!tbody) return;
+
+  tbody.innerHTML = '';
+
+  players.forEach((p) => {
+    const tr = document.createElement('tr');
+
+    const tdNick = document.createElement('td');
+    tdNick.innerHTML = `<strong>${p.nick || 'Brawler'}</strong><br><small style="opacity:0.6">${p.id}</small>`;
+    tr.appendChild(tdNick);
+
+    const tdVD = document.createElement('td');
+    tdVD.textContent = `${p.wins || 0} V / ${p.losses || 0} D`;
+    tr.appendChild(tdVD);
+
+    const tdPts = document.createElement('td');
+    tdPts.style.color = 'var(--neon-cyan)';
+    tdPts.textContent = p.points || 0;
+    tr.appendChild(tdPts);
+
+    const tdActions = document.createElement('td');
+    tdActions.style.display = 'flex';
+    tdActions.style.gap = '4px';
+    tdActions.style.flexWrap = 'wrap';
+
+    tdActions.innerHTML = `
+      <button class="btn btn-sm" onclick="adminMatchChange('${p.id}', 'win', 1)" title="Sumar victoria">+V</button>
+      <button class="btn btn-sm" onclick="adminMatchChange('${p.id}', 'win', -1)" title="Restar victoria">-V</button>
+      <button class="btn btn-sm btn-danger" onclick="adminMatchChange('${p.id}', 'loss', 1)" title="Sumar derrota">+D</button>
+      <button class="btn btn-sm btn-danger" onclick="adminMatchChange('${p.id}', 'loss', -1)" title="Restar derrota">-D</button>
+    `;
+    tr.appendChild(tdActions);
+
+    tbody.appendChild(tr);
+  });
+}
+
+async function adminMatchChange(playerId, type, amount) {
+  const player = players.find(p => p.id === playerId);
+  if (!player) return;
+
+  if (type === 'win') {
+    player.wins = Math.max(0, (player.wins || 0) + amount);
+  } else if (type === 'loss') {
+    player.losses = Math.max(0, (player.losses || 0) + amount);
+  }
+
+  recalculatePoints(player);
+  await saveUserToCloud(player);
+}
+
+async function resetSeason() {
+  const confirm1 = confirm('⚠️ ¿Estás SEGURO de que deseas reiniciar la Liga Bakugan?');
+  if (!confirm1) return;
+
+  const confirm2 = confirm('🚨 ESTA ACCIÓN NO SE PUEDE DESHACER. Se llevarán a 0 todas las partidas y puntos de Firebase.');
+  if (!confirm2) return;
+
+  const batch = db.batch();
+  players.forEach(p => {
+    p.wins = 0;
+    p.losses = 0;
+    p.points = 0;
+    const docRef = db.collection("players").doc(p.id);
+    batch.update(docRef, { wins: 0, losses: 0, points: 0 });
+  });
+
+  await batch.commit();
+  alert('🔄 ¡La liga en la nube ha sido reiniciada a cero con éxito!');
+}
+
+/* =====================================================
+   TABS Y NAVEGACIÓN
+===================================================== */
+function switchTab(tabName) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+
+  const targetBtn = document.querySelector(`.tab-btn[data-tab="${tabName}"]`);
+  const targetSec = document.getElementById('sec-' + tabName);
+
+  if (targetBtn) targetBtn.classList.add('active');
+  if (targetSec) targetSec.classList.add('active');
+}
+
+document.querySelectorAll('.tab-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    switchTab(btn.dataset.tab);
+  });
+});
+
+/* =====================================================
+   GUÍA DEL PERSONAJE
+===================================================== */
+const guideMessages = [
+  '¡Genial que estés aquí, Brawler! Voy a mostrarte un poco la arena.',
+  'En <strong>Perfil</strong> puedes cambiar tu Nick cuando gustes, ver tu ID de jugador y tu contacto registrado.',
+  'También puedes seleccionar tus <strong>Facciones preferidas</strong>, cambiar tu ícono avatar y definir tus <strong>tres Bakugan de equipo</strong>.',
+  'En el apartado <strong>Liga</strong> verás tu posición en el Ranking, tus puntos acumulados y en qué rango te encuentras.',
+  'Si eres nuevo en el TCG, tienes un <strong>Glosario</strong> en el último apartado para consultar cuando gustes.',
+  '¡Listo! Ya conoces lo básico. Si necesitas recordar algo, tócalo o pulsa el <strong>?</strong>.'
+];
+
+function startGuide() {
+  guideStep = 0;
+  guideFinished = false;
+  const box = document.getElementById('char-box');
+  const img = document.getElementById('guide-img');
+  
+  if (box) box.classList.remove('mini');
+  if (img) img.src = GUIDE_POSES[0];
+  document.getElementById('help-btn').style.display = 'none';
+  showNextGuide();
+}
+
+function showNextGuide() {
+  const bubble = document.getElementById('guide-bubble');
+  const img = document.getElementById('guide-img');
+
+  if (guideStep < guideMessages.length) {
+    bubble.innerHTML = guideMessages[guideStep];
+    bubble.style.display = 'block';
+
+    const pose = GUIDE_POSES[guideStep] || GUIDE_POSES[0];
+    if (img) img.src = pose; 
+
+    guideStep++;
+
+    if (guideStep < guideMessages.length) {
+      setTimeout(showNextGuide, 5000);
+    } else {
+      setTimeout(() => {
+        bubble.style.display = 'none';
+        finishGuide();
+      }, 5500);
+    }
+  }
+}
+
+function finishGuide() {
+  guideFinished = true;
+  const box = document.getElementById('char-box');
+  const img = document.getElementById('guide-img');
+  
+  if (box) box.classList.add('mini');
+  if (img) img.src = GUIDE_MINI;
+  document.getElementById('help-btn').style.display = 'flex';
+}
+
+function toggleGuideHelp() {
+  const bubble = document.getElementById('guide-bubble');
+  if (bubble.style.display === 'block') {
+    bubble.style.display = 'none';
+  } else {
+    bubble.innerHTML = 'Puedes editar tu perfil, cambiar tu Nickname, ver el ranking y consultar el Glosario. ¡Cualquier duda estoy aquí!';
+    bubble.style.display = 'block';
+    setTimeout(() => bubble.style.display = 'none', 6000);
+  }
+}
+
+function showGuideMessage(msg) {
+  const bubble = document.getElementById('guide-bubble');
+  bubble.innerHTML = msg;
+  bubble.style.display = 'block';
+  setTimeout(() => bubble.style.display = 'none', 3500);
+}
+
+/* =====================================================
+   INICIALIZACIÓN
+===================================================== */
+listenToDatabase();
+
+if (currentUserId) {
+  enterApp();
+} else {
+  buildAvatarGrid();
+}
+</script>
+</body>
+</html>
