@@ -1,0 +1,2373 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<title>Liga Bakugan · Cyber HUD</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Rajdhani:wght@400;500;600;700&display=swap');
+
+  :root {
+    --neon-cyan: #00f0ff;
+    --neon-magenta: #ff00aa;
+    --neon-purple: #b000ff;
+    --neon-green: #00ff9d;
+    --bg-dark: #0a0a12;
+    --panel: rgba(10, 15, 30, 0.85);
+    --border: rgba(0, 240, 255, 0.4);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Rajdhani', sans-serif;
+    background: var(--bg-dark);
+    color: #e0f7ff;
+    min-height: 100vh;
+    overflow-x: hidden;
+    position: relative;
+  }
+
+  /* ====== FONDO HEXAGONAL ANIMADO ====== */
+  .hex-bg {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    background:
+      radial-gradient(ellipse at 20% 30%, rgba(0, 240, 255, 0.08) 0%, transparent 50%),
+      radial-gradient(ellipse at 80% 70%, rgba(255, 0, 170, 0.07) 0%, transparent 50%),
+      #05050a;
+    overflow: hidden;
+  }
+  .hex-bg::before {
+    content: "";
+    position: absolute;
+    inset: -50%;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='56' viewBox='0 0 100 56'%3E%3Cpath d='M66 28L50 0L16 0L0 28L16 56L50 56L66 28L100 28' fill='none' stroke='%2300f0ff' stroke-opacity='0.12' stroke-width='1'/%3E%3Cpath d='M0 28L34 28L50 0L84 0L100 28L84 56L50 56L34 28' fill='none' stroke='%23ff00aa' stroke-opacity='0.08' stroke-width='1'/%3E%3C/svg%3E");
+    background-size: 100px 56px;
+    animation: hexMove 40s linear infinite;
+    opacity: 0.7;
+  }
+  @keyframes hexMove {
+    0% { transform: translate(0, 0); }
+    100% { transform: translate(-100px, -56px); }
+  }
+
+  /* ====== LAYOUT PRINCIPAL ====== */
+  .app {
+    position: relative;
+    z-index: 1;
+    max-width: 480px;
+    margin: 0 auto;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    padding-bottom: 70px;
+  }
+ 
+  /* HEADER */
+  header {
+    background: linear-gradient(180deg, rgba(0,20,40,0.95), transparent);
+    padding: 14px 16px 8px;
+    text-align: center;
+    border-bottom: 1px solid var(--border);
+    position: relative;
+  }
+
+  .admin-toggle-btn {
+    position: absolute;
+    top: 10px;
+    right: 12px;
+    background: rgba(0, 240, 255, 0.1);
+    border: 1px solid var(--border);
+    color: var(--neon-cyan);
+    border-radius: 6px;
+    padding: 4px 8px;
+    font-size: 0.65rem;
+    cursor: pointer;
+    font-family: 'Orbitron', sans-serif;
+    transition: 0.2s;
+  }
+  .admin-toggle-btn:hover {
+    background: rgba(0, 240, 255, 0.3);
+  }
+
+  .logo-title {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+  }
+
+  .logo-img {
+    width: auto;
+    height: 72px;
+    object-fit: contain;
+    filter: drop-shadow(0 0 6px #00f0ff) drop-shadow(0 0 12px #ff00aa);
+  }
+
+  header h1 {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1.15rem;
+    font-weight: 700;
+    letter-spacing: 2px;
+    background: linear-gradient(90deg, var(--neon-cyan), var(--neon-magenta));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    filter: drop-shadow(0 0 4px rgba(0,240,255,0.8)) drop-shadow(0 0 10px rgba(255,0,170,0.5));
+  }
+
+  .sub {
+    font-size: 0.7rem;
+    color: rgba(0,240,255,0.6);
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    text-shadow: 0 0 8px rgba(0,240,255,0.4);
+  }
+
+  /* TABS */
+  .tabs {
+    display: flex;
+    background: rgba(0,10,25,0.9);
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+  .tab-btn {
+    flex: 1;
+    padding: 12px 2px;
+    background: transparent;
+    border: none;
+    color: rgba(0,240,255,0.45);
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.6rem;
+    letter-spacing: 1px;
+    cursor: pointer;
+    position: relative;
+    transition: 0.25s;
+  }
+  .tab-btn.active {
+    color: var(--neon-cyan);
+    text-shadow: 0 0 10px var(--neon-cyan);
+  }
+  .tab-btn.active::after {
+    content: "";
+    position: absolute;
+    bottom: 0; left: 10%; right: 10%;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--neon-cyan), transparent);
+    box-shadow: 0 0 8px var(--neon-cyan);
+  }
+
+  /* CONTENIDO */
+  .content {
+    flex: 1;
+    padding: 16px;
+    overflow-y: auto;
+  }
+  .panel {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 14px;
+    box-shadow: 0 0 20px rgba(0,240,255,0.08), inset 0 0 30px rgba(0,0,0,0.3);
+    position: relative;
+    overflow: hidden;
+  }
+  .panel::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--neon-cyan), transparent);
+  }
+
+  /* PANEL ADMIN ESPECÍFICO */
+  .panel-admin {
+    border-color: var(--neon-magenta);
+    box-shadow: 0 0 20px rgba(255, 0, 170, 0.15);
+  }
+  .panel-admin::before {
+    background: linear-gradient(90deg, transparent, var(--neon-magenta), transparent);
+  }
+
+  /* FORMULARIOS */
+  label {
+    display: block;
+    font-size: 0.75rem;
+    color: var(--neon-cyan);
+    margin-bottom: 4px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+  input, select, textarea {
+    width: 100%;
+    background: rgba(0,20,40,0.7);
+    border: 1px solid rgba(0,240,255,0.25);
+    border-radius: 8px;
+    padding: 10px 12px;
+    color: #fff;
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 1rem;
+    margin-bottom: 12px;
+    outline: none;
+    transition: 0.2s;
+  }
+  input:focus, select:focus, textarea:focus {
+    border-color: var(--neon-cyan);
+    box-shadow: 0 0 12px rgba(0,240,255,0.25);
+  }
+
+  .btn {
+    display: inline-block;
+    width: 100%;
+    padding: 12px;
+    background: linear-gradient(135deg, rgba(0,240,255,0.2), rgba(255,0,170,0.15));
+    border: 1px solid var(--neon-cyan);
+    border-radius: 8px;
+    color: var(--neon-cyan);
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.8rem;
+    letter-spacing: 1.5px;
+    cursor: pointer;
+    transition: 0.25s;
+    text-align: center;
+  }
+  .btn:hover, .btn:active {
+    background: linear-gradient(135deg, rgba(0,240,255,0.35), rgba(255,0,170,0.25));
+    box-shadow: 0 0 18px rgba(0,240,255,0.35);
+  }
+  .btn-sm {
+    width: auto;
+    padding: 6px 12px;
+    font-size: 0.7rem;
+  }
+  .btn-danger {
+    border-color: #ff0055;
+    color: #ff4477;
+    background: rgba(255, 0, 85, 0.15);
+  }
+  .btn-danger:hover {
+    background: rgba(255, 0, 85, 0.35);
+    box-shadow: 0 0 15px rgba(255, 0, 85, 0.4);
+  }
+
+  /* PERSONAJE GUÍA */
+  #guide-character {
+    position: fixed;
+    bottom: 20px;
+    right: 16px;
+    z-index: 50;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 10px;
+    max-width: 280px;
+    pointer-events: none;
+  }
+  #guide-character.active {
+    pointer-events: auto;
+  }
+
+  .speech-bubble {
+    background: rgba(5,15,30,0.95);
+    border: 1px solid var(--neon-cyan);
+    border-radius: 12px 12px 0 12px;
+    padding: 10px 14px;
+    font-size: 0.85rem;
+    line-height: 1.35;
+    box-shadow: 0 0 15px rgba(0,240,255,0.2);
+    position: relative;
+    animation: fadeIn 0.4s ease;
+  }
+  .speech-bubble::after {
+    content: "";
+    position: absolute;
+    bottom: -8px; right: 18px;
+    border: 8px solid transparent;
+    border-top-color: var(--neon-cyan);
+    border-bottom: 0;
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ====== AVATAR HEXAGONAL EN PERFIL Y MODAL ====== */
+  .profile-avatar-hex-container {
+    position: relative;
+    width: 130px;
+    height: 110px;
+    margin: 0 auto;
+    filter: drop-shadow(0 0 12px #00f0ff);
+  }
+
+  .profile-avatar-hex-container::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: var(--neon-cyan);
+    clip-path: polygon(30% 0%, 70% 0%, 100% 50%, 70% 100%, 30% 100%, 0% 50%);
+    z-index: 1;
+  }
+
+  .player-avatar-hex {
+    position: absolute;
+    inset: 3px; 
+    width: calc(100% - 6px);
+    height: calc(100% - 6px);
+    object-fit: cover;
+    object-position: center;
+    background: rgba(10, 15, 30, 0.95);
+    clip-path: polygon(30% 0%, 70% 0%, 100% 50%, 70% 100%, 30% 100%, 0% 50%);
+    z-index: 2;
+  }
+
+  /* AVATAR DE LA GUÍA FLOTANTE */
+  .char-wrapper {
+    position: relative;
+    width: 130px;
+    height: 110px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    filter: drop-shadow(0 0 10px #00f0ff) drop-shadow(0 0 20px rgba(0, 240, 255, 0.5));
+  }
+
+  .char-wrapper::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: var(--neon-cyan);
+    clip-path: polygon(30% 0%, 70% 0%, 100% 50%, 70% 100%, 30% 100%, 0% 50%);
+    z-index: 1;
+  }
+
+  .char-img {
+    position: absolute;
+    inset: 3px; 
+    width: calc(100% - 6px);
+    height: calc(100% - 6px);
+    object-fit: contain;
+    object-position: center;
+    background: rgba(10, 15, 30, 0.95);
+    clip-path: polygon(30% 0%, 70% 0%, 100% 50%, 70% 100%, 30% 100%, 0% 50%);
+    z-index: 2;
+  }
+
+  .char-wrapper.mini {
+    width: 95px;
+    height: 80px;
+    filter: drop-shadow(0 0 8px #00f0ff) drop-shadow(0 0 16px rgba(0, 240, 255, 0.6));
+  }
+
+  .help-btn {
+    position: absolute;
+    top: -2px;
+    right: -2px;
+    background: var(--neon-magenta);
+    color: #fff;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 0 8px var(--neon-magenta);
+    z-index: 5;
+  }
+
+  /* RANKING Y ADMIN LIST */
+  .rank-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.85rem;
+  }
+  .rank-table th {
+    text-align: left;
+    padding: 8px 4px;
+    color: var(--neon-cyan);
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.65rem;
+    letter-spacing: 1px;
+    border-bottom: 1px solid var(--border);
+  }
+  .rank-table td {
+    padding: 10px 4px;
+    border-bottom: 1px solid rgba(0,240,255,0.1);
+    vertical-align: middle;
+  }
+  .rank-row-interactive {
+    cursor: pointer;
+    transition: background 0.2s ease;
+  }
+  .rank-row-interactive:hover {
+    background: rgba(0, 240, 255, 0.12) !important;
+  }
+  .player-avatar, .avatar-opt {
+    width: 48px;
+    height: 48px;
+    object-fit: cover;
+    clip-path: polygon(30% 0%, 70% 0%, 100% 50%, 70% 100%, 30% 100%, 0% 50%);
+    vertical-align: middle;
+  }
+  .rank-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 0.65rem;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+  }
+  .rank-badge-img-table {
+    width: 24px;
+    height: 24px;
+    object-fit: contain;
+  }
+  .rank-novato { background: #333; color: #aaa; }
+  .rank-bronce { background: #5c3a1e; color: #e0a060; }
+  .rank-plata  { background: #3a3a4a; color: #c0c0d0; }
+  .rank-oro    { background: #4a3a10; color: #ffd700; }
+  .rank-diamante { background: #0a3a4a; color: #00e5ff; }
+  .rank-rey    { background: linear-gradient(90deg,#4a0060,#8000ff); color: #ff00ff; box-shadow: 0 0 8px #ff00ff; }
+
+  /* ====== VENTANA MODAL FLOTANTE ====== */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(5, 5, 12, 0.85);
+    backdrop-filter: blur(5px);
+    z-index: 200;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s ease;
+  }
+  .modal-overlay.active {
+    opacity: 1;
+    pointer-events: auto;
+  }
+  .modal-card {
+    background: rgba(10, 15, 30, 0.95);
+    border: 1px solid var(--neon-cyan);
+    border-radius: 14px;
+    width: 100%;
+    max-width: 360px;
+    padding: 20px;
+    box-shadow: 0 0 30px rgba(0, 240, 255, 0.25);
+    position: relative;
+    text-align: center;
+    transform: scale(0.9);
+    transition: transform 0.25s ease;
+  }
+  .modal-overlay.active .modal-card {
+    transform: scale(1);
+  }
+  .modal-close-btn {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background: transparent;
+    border: none;
+    color: var(--neon-cyan);
+    font-size: 1.2rem;
+    font-weight: bold;
+    cursor: pointer;
+  }
+  .modal-brawler-nick {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1.2rem;
+    color: var(--neon-cyan);
+    margin-top: 8px;
+  }
+  .modal-rank-container {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin: 8px 0 14px;
+    background: rgba(0, 240, 255, 0.08);
+    padding: 4px 12px;
+    border-radius: 20px;
+    border: 1px solid rgba(0, 240, 255, 0.2);
+  }
+  .modal-rank-img {
+    width: 28px;
+    height: 28px;
+    object-fit: contain;
+  }
+  .modal-rank-title {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.75rem;
+    letter-spacing: 1px;
+  }
+  .modal-section-title {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.65rem;
+    color: var(--neon-magenta);
+    letter-spacing: 1px;
+    margin: 12px 0 6px;
+    text-transform: uppercase;
+  }
+  .modal-bakugan-list {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .modal-bakugan-item {
+    background: rgba(0, 20, 40, 0.6);
+    border: 1px solid rgba(0, 240, 255, 0.2);
+    border-radius: 6px;
+    padding: 6px;
+    font-size: 0.85rem;
+  }
+  .modal-factions-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 6px;
+    margin-top: 4px;
+  }
+  .modal-faction-tag {
+    background: rgba(255, 0, 170, 0.15);
+    border: 1px solid var(--neon-magenta);
+    color: #fff;
+    font-size: 0.7rem;
+    padding: 2px 8px;
+    border-radius: 4px;
+  }
+
+  /* INSIGNIAS GRID */
+  .badge-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+    gap: 12px;
+    margin-top: 10px;
+  }
+  .badge-item {
+    background: rgba(0, 20, 40, 0.6);
+    border: 1px solid rgba(0, 240, 255, 0.2);
+    border-radius: 8px;
+    padding: 10px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .badge-img {
+    width: 54px;
+    height: 54px;
+    object-fit: contain;
+    margin-bottom: 6px;
+    filter: drop-shadow(0 0 6px var(--neon-cyan));
+  }
+
+  /* ====== NOTICIAS STYLES ====== */
+  .news-card {
+    background: rgba(5, 15, 30, 0.85);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px;
+    margin-bottom: 16px;
+    position: relative;
+    box-shadow: 0 0 10px rgba(0,240,255,0.1);
+  }
+  .news-title {
+    font-family: 'Orbitron', sans-serif;
+    color: var(--neon-cyan);
+    font-size: 1.05rem;
+    margin-bottom: 6px;
+    text-shadow: 0 0 6px rgba(0,240,255,0.4);
+  }
+  .news-date {
+    font-size: 0.65rem;
+    color: rgba(255, 255, 255, 0.5);
+    margin-bottom: 10px;
+    display: block;
+  }
+  .news-body {
+    font-size: 0.9rem;
+    line-height: 1.4;
+    white-space: pre-line;
+    margin-bottom: 10px;
+    color: #e0f7ff;
+  }
+  .news-img {
+    width: 100%;
+    max-height: 250px;
+    object-fit: cover;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    margin-top: 8px;
+  }
+
+  /* ====== GLOSARIO ====== */
+  .glossary-item {
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid rgba(0,240,255,0.1);
+  }
+  .glossary-item h4 {
+    color: var(--neon-cyan);
+    text-shadow: 0 0 8px rgba(0, 240, 255, 0.6);
+    font-size: 0.95rem;
+    margin-bottom: 6px;
+    font-family: 'Orbitron', sans-serif;
+  }
+  .glossary-item p { 
+    font-size: 0.85rem; 
+    opacity: 0.85; 
+    margin-bottom: 8px;
+  }
+  .glossary-img {
+    width: 100%;
+    height: auto;
+    max-height: 220px;
+    object-fit: contain;
+    border-radius: 8px;
+    border: 1px solid rgba(0, 240, 255, 0.3);
+    margin-top: 8px;
+    background: rgba(0, 10, 25, 0.5);
+    box-shadow: 0 0 10px rgba(0, 240, 255, 0.1);
+  }
+
+  /* STATS */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin: 12px 0;
+  }
+  .stat-box {
+    background: rgba(0,30,50,0.6);
+    border: 1px solid rgba(0,240,255,0.2);
+    border-radius: 8px;
+    padding: 10px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+  .stat-box .num {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1.4rem;
+    color: var(--neon-cyan);
+  }
+  .stat-box .lbl {
+    font-size: 0.65rem;
+    color: rgba(0,240,255,0.6);
+    letter-spacing: 1px;
+  }
+
+  /* INSIGNIA EN PERFIL ESTADÍSTICAS */
+  .stat-rank-badge-img {
+    width: 50px;
+    height: 50px;
+    object-fit: contain;
+    margin-bottom: 6px;
+    transform: scale(2.25);
+    filter: drop-shadow(0 0 8px var(--neon-cyan));
+    transition: transform 0.3s ease;
+  }
+
+  /* SECCIONES */
+  .section { display: none; }
+  .section.active { display: block; }
+
+  /* BIENVENIDA FULL */
+  #welcome-screen {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    background: rgba(5,5,15,0.97);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    text-align: center;
+  }
+  #welcome-screen.hidden { display: none; }
+
+  .welcome-char {
+    width: 140px;
+    height: 140px;
+    border-radius: 50%;
+    border: 3px solid var(--neon-magenta);
+    box-shadow: 0 0 40px rgba(255,0,170,0.5);
+    object-fit: cover;
+    margin-bottom: 20px;
+    background: #111;
+  }
+  .welcome-bubble {
+    background: rgba(10,20,40,0.95);
+    border: 1px solid var(--neon-cyan);
+    border-radius: 16px;
+    padding: 18px 20px;
+    max-width: 340px;
+    margin-bottom: 24px;
+    font-size: 1rem;
+    line-height: 1.45;
+    position: relative;
+  }
+  .welcome-bubble::after {
+    content: "";
+    position: absolute;
+    top: -10px; left: 50%;
+    transform: translateX(-50%);
+    border: 10px solid transparent;
+    border-bottom-color: var(--neon-cyan);
+  }
+
+  /* AVATARS EN SELECCIÓN */
+  .avatar-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 16px;
+    min-height: 50px;
+  }
+  .avatar-opt {
+    width: 48px; 
+    height: 48px;
+    border: 2px solid transparent;
+    cursor: pointer;
+    object-fit: cover;
+    transition: 0.2s;
+  }
+  .avatar-opt.selected {
+    filter: drop-shadow(0 0 6px var(--neon-cyan));
+    border-color: var(--neon-cyan);
+    transform: scale(1.1);
+  }
+
+  @media (min-width: 500px) {
+    .app { max-width: 520px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- FONDO ANIMADO -->
+<div class="hex-bg"></div>
+
+<!-- ============ PANTALLA DE BIENVENIDA ============ -->
+<div id="welcome-screen">
+  <img src="Lady_fenne_04.png" alt="Guía" class="welcome-char" id="welcome-char-img"
+       onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Ccircle cx=%2250%22 cy=%2250%22 r=%2248%22 fill=%22%23111%22 stroke=%22%23ff00aa%22 stroke-width=%223%22/%3E%3Ctext x=%2250%22 y=%2258%22 text-anchor=%22middle%22 fill=%22%23ff00aa%22 font-size=%2230%22%3E?%3C/text%3E%3C/svg%3E'">
+
+  <div class="welcome-bubble" id="welcome-text">
+    ¡Bienvenido Brawler a la <strong>Liga Bakugan</strong>!<br><br>
+    Por favor indica tu <strong>nombre o Nick-name</strong> para comenzar.
+  </div>
+
+  <div style="width:100%; max-width:300px;">
+    <input type="text" id="nick-input" placeholder="Tu Nick-name..." maxlength="20" />
+    <button class="btn" onclick="startRegistration()">ENTRAR A LA LIGA</button>
+  </div>
+</div>
+
+<!-- ============ APP PRINCIPAL ============ -->
+<div class="app" id="main-app" style="display:none;">
+
+  <header>
+    <button class="admin-toggle-btn" onclick="promptAdminAccess()">⚙️ ADMIN</button>
+    <div class="logo-title">
+      <img src="LOGO-BAKUGAN.png" alt="Bakugan" class="logo-img" onerror="this.style.display='none'">
+      <div>
+        <h1>LIGA BAKUGAN</h1>
+        <div class="sub">Arena the Brawlers · TCG</div>
+      </div>
+    </div>
+  </header>
+
+  <div class="tabs">
+    <button class="tab-btn active" data-tab="perfil">PERFIL</button>
+    <button class="tab-btn" data-tab="liga">LIGA</button>
+    <button class="tab-btn" data-tab="noticias">NOTICIAS</button>
+    <button class="tab-btn" data-tab="glosario">GLOSARIO</button>
+    <button class="tab-btn" id="tab-admin-btn" data-tab="admin" style="display:none; color: var(--neon-magenta);">ADMIN</button>
+  </div>
+
+  <div class="content">
+
+    <!-- ===== PERFIL ===== -->
+    <div class="section active" id="sec-perfil">
+      <div class="panel">
+        <h3 style="font-family:'Orbitron';color:var(--neon-cyan);margin-bottom:12px;font-size:0.9rem;">MI PERFIL</h3>
+
+        <div style="text-align:center;margin-bottom:16px;">
+          <div class="profile-avatar-hex-container">
+            <img id="profile-avatar" src="dragonoid_diamante_icon.jpg" class="player-avatar-hex" alt="Avatar" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Crect width=%22100%22 height=%22100%22 fill=%22%230a0f1e%22/%3E%3Ctext x=%2250%22 y=%2255%22 fill=%22%2300f0ff%22 font-size=%2212%22 text-anchor=%22middle%22%3EAVATAR%3C/text%3E%3C/svg%3E'">
+          </div>
+          
+          <div id="profile-nick-display" style="font-family:'Orbitron';font-size:1.2rem;margin-top:10px;color:var(--neon-cyan);">Cargando...</div>
+          <div id="profile-id" style="font-size:0.75rem;color:rgba(0,240,255,0.6);">---</div>
+        </div>
+
+        <label for="nick-edit-input">Nick-Name (Modificable)</label>
+        <input type="text" id="nick-edit-input" placeholder="Tu Nickname..." maxlength="20" />
+
+        <label for="contact-input">Contacto (Gmail o Teléfono)</label>
+        <input type="text" id="contact-input" placeholder="ejemplo@mail.com o +54..." />
+
+        <label for="faction-select">Facciones preferidas</label>
+        <select id="faction-select" multiple style="height:80px;">
+          <option value="Pyrus">Pyrus</option>
+          <option value="Aquos">Aquos</option>
+          <option value="Ventus">Ventus</option>
+          <option value="Aurelus">Aurelus</option>
+          <option value="Haos">Haos</option>
+          <option value="Darkus">Darkus</option>
+        </select>
+
+        <label>Avatar (elige uno)</label>
+        <div class="avatar-grid" id="avatar-grid"></div>
+
+        <label>Tus 3 Bakugan de equipo (Team Main)</label>
+        <input type="text" id="baku1" placeholder="Bakugan 1" />
+        <input type="text" id="baku2" placeholder="Bakugan 2" />
+        <input type="text" id="baku3" placeholder="Bakugan 3" />
+
+        <button class="btn" onclick="saveProfile()">GUARDAR PERFIL</button>
+      </div>
+
+      <div class="panel">
+        <h3 style="font-family:'Orbitron';color:var(--neon-cyan);margin-bottom:10px;font-size:0.85rem;">MIS ESTADÍSTICAS</h3>
+        <div class="stats-grid">
+          <div class="stat-box"><div class="num" id="stat-points">0</div><div class="lbl">PUNTOS</div></div>
+          <div class="stat-box">
+            <img id="stat-rank-badge" src="Insignea_Novato_01.png" class="stat-rank-badge-img" alt="Insignia Rango">
+            <div class="num" id="stat-rank" style="font-size:0.9rem; margin-top:10px;">NOVATO</div>
+            <div class="lbl">RANGO</div>
+          </div>
+          <div class="stat-box"><div class="num" id="stat-wins">0</div><div class="lbl">VICTORIAS</div></div>
+          <div class="stat-box"><div class="num" id="stat-losses">0</div><div class="lbl">DERROTAS</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== LIGA ===== -->
+    <div class="section" id="sec-liga">
+      <div class="panel">
+        <h3 style="font-family:'Orbitron';color:var(--neon-cyan);margin-bottom:12px;font-size:0.9rem;">RANKING DE LA LIGA</h3>
+        <div style="overflow-x:auto;">
+          <table class="rank-table">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th></th>
+                <th>NICK</th>
+                <th>PUNTOS</th>
+                <th>V/D</th>
+                <th>RANGO</th>
+              </tr>
+            </thead>
+            <tbody id="rank-body"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h3 style="font-family:'Orbitron';color:var(--neon-cyan);margin-bottom:8px;font-size:0.85rem;">SISTEMA DE PUNTOS</h3>
+        <p style="font-size:0.85rem;opacity:0.8;line-height:1.5;">
+          • Cada <strong>victoria</strong> suma <span style="color:var(--neon-green)">+50</span> puntos<br>
+          • Cada <strong>derrota</strong> resta <span style="color:#ff4466">-25</span> puntos<br><br>
+          <strong>Rangos e Insignias:</strong>
+        </p>
+
+        <!-- INSIGNIAS DE LIGA -->
+        <div class="badge-list">
+          <div class="badge-item">
+            <img src="Insignea_Novato_01.png" class="badge-img" alt="Novato">
+            <span style="font-size:0.8rem; font-weight:bold;">Novato</span>
+            <span style="font-size:0.7rem; opacity:0.7;">0 – 199 pts</span>
+          </div>
+          <div class="badge-item">
+            <img src="Insignea_bronce_02.png" class="badge-img" alt="Bronce">
+            <span style="font-size:0.8rem; font-weight:bold; color:#e0a060;">Bronce</span>
+            <span style="font-size:0.7rem; opacity:0.7;">200 – 499 pts</span>
+          </div>
+          <div class="badge-item">
+            <img src="Insignea_plata_03.png" class="badge-img" alt="Plata">
+            <span style="font-size:0.8rem; font-weight:bold; color:#c0c0d0;">Plata</span>
+            <span style="font-size:0.7rem; opacity:0.7;">500 – 999 pts</span>
+          </div>
+          <div class="badge-item">
+            <img src="Insignea_Oro_04.png" class="badge-img" alt="Oro">
+            <span style="font-size:0.8rem; font-weight:bold; color:#ffd700;">Oro</span>
+            <span style="font-size:0.7rem; opacity:0.7;">1000 – 1599 pts</span>
+          </div>
+          <div class="badge-item">
+            <img src="Insignea_platino_05.png" class="badge-img" alt="Diamante">
+            <span style="font-size:0.8rem; font-weight:bold; color:#00e5ff;">Diamante</span>
+            <span style="font-size:0.7rem; opacity:0.7;">1600 – 3499 pts</span>
+          </div>
+          <div class="badge-item">
+            <img src="Insignea_rey_07.png" class="badge-img" alt="Rey de Batallas">
+            <span style="font-size:0.8rem; font-weight:bold; color:#ff00ff;">Rey de Batallas</span>
+            <span style="font-size:0.7rem; opacity:0.7;">3500+ pts</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== NOTICIAS ===== -->
+    <div class="section" id="sec-noticias">
+      <div class="panel">
+        <h3 style="font-family:'Orbitron';color:var(--neon-cyan);margin-bottom:14px;font-size:0.9rem;">TABLÓN DE NOTICIAS</h3>
+        <input type="text" id="news-search-input" placeholder="🔍 Buscar noticias..." oninput="filterNews()" style="margin-bottom:14px;" />
+        <div id="news-container">
+          <p style="text-align:center; opacity:0.6; font-size:0.85rem;">Cargando novedades...</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== GLOSARIO ===== -->
+    <div class="section" id="sec-glosario">
+      <div class="panel">
+        <h3 style="font-family:'Orbitron';color:var(--neon-cyan);margin-bottom:14px;font-size:0.9rem;">GLOSARIO TCG</h3>
+
+        <h4 style="color:var(--neon-magenta); font-family:'Orbitron'; margin: 15px 0 10px 0; font-size: 0.85rem; border-bottom: 1px solid var(--neon-magenta); padding-bottom: 4px;">BASES DEL JUEGO</h4>
+
+        <div class="glossary-item">
+          <h4>Matrix o Campo</h4>
+          <p>Es donde se lanzan los Bakugan para pelear. Está conformada por los 12 BakuCore (6 de cada jugador correspondientes a sus Bakugan).</p>
+          <img src="brawler.jpg" class="glossary-img" alt="Matrix o Campo" onerror="this.style.display='none'">
+        </div>
+
+        <div class="glossary-item">
+          <h4>Bakugan</h4>
+          <p>Criaturas esféricas que se abren en el campo de batalla. Cada uno tiene una Facción (Pyrus, Aquos, etc.), posee dos estadísticas (B-Power y Daño) y se debe jugar con sus BakuCores correspondientes.</p>
+          <img src="bakugan.jpg" class="glossary-img" alt="Bakugan" onerror="this.style.display='none'">
+        </div>
+
+        <div class="glossary-item">
+          <h4>B-Power</h4>
+          <p>Representa la energía de combate o fuerza del Bakugan. Quien logre el B-Power más alto durante la batalla gana la ronda.</p>
+          <img src="simbolo_bpower.png" class="glossary-img" alt="B-Power" onerror="this.style.display='none'">
+        </div>
+
+        <div class="glossary-item">
+          <h4>Daño</h4>
+          <p>Indica la cantidad de cartas que el oponente debe retirar/descartar de su mazo si tu Bakugan gana el combate.</p>
+          <img src="simbolo_dano.png" class="glossary-img" alt="Daño" onerror="this.style.display='none'">
+        </div>
+
+        <div class="glossary-item">
+          <h4>Carta Personaje</h4>
+          <p>Muestra las estadísticas base (B-Power y Daño), la facción y los BakuCores requeridos de tu Bakugan.</p>
+          <img src="carta_personaje.png" class="glossary-img" alt="Carta Personaje" onerror="this.style.display='none'">
+        </div>
+
+        <div class="glossary-item">
+          <h4>Carta Acción</h4>
+          <p>Cartas que juegas pagando Energía para potenciar estadísticas, modificar el campo o cambiar el curso del combate.</p>
+          <img src="carta_accion.png" class="glossary-img" alt="Carta Acción" onerror="this.style.display='none'">
+        </div>
+
+        <div class="glossary-item">
+          <h4>Carta Héroe</h4>
+          <p>Se quedan en el campo una vez jugadas y otorgan efectos pasivos o habilidades continuas durante toda la partida.</p>
+          <img src="carta_heroe.png" class="glossary-img" alt="Carta Héroe" onerror="this.style.display='none'">
+        </div>
+
+        <div class="glossary-item">
+          <h4>Carta Flip</h4>
+          <p>Cartas defensivas que se activan inmediatamente cuando recibes daño del mazo para detener ataques o contraatacar.</p>
+          <img src="carta_flip.png" class="glossary-img" alt="Carta Flip" onerror="this.style.display='none'">
+        </div>
+
+        <div class="glossary-item">
+          <h4>Carta Evo</h4>
+          <p>Evoluciones que colocas sobre una Carta de Personaje activa para aumentar drásticamente sus estadísticas y ganar nuevas habilidades.</p>
+          <img src="carta_evo.png" class="glossary-img" alt="Carta Evo" onerror="this.style.display='none'">
+        </div>
+
+        <div class="glossary-item">
+          <h4>Carta Gear</h4>
+          <p>Equipamiento o armamento (Baku-Gear) que sumas a tus Bakugan pagando su coste en energía para potenciar tus ataques.</p>
+          <img src="carta_gear.png" class="glossary-img" alt="Carta Gear" onerror="this.style.display='none'">
+        </div>
+
+        <h4 style="color:var(--neon-magenta); font-family:'Orbitron'; margin: 20px 0 10px 0; font-size: 0.85rem; border-bottom: 1px solid var(--neon-magenta); padding-bottom: 4px;">TIPOS DE BAKUCORE</h4>
+
+        <div class="glossary-item">
+          <h4>Shield Core</h4>
+          <p>shield(Escudo Naranja): Un Bakucore centrado en otorgar B-Power. Las variantes que otorgan la mayor cantidad de esta estadística suelen incluir restricciones de Facción, mientras que los cores orientados a debuff reducen B-Power de forma general sin condiciones de atributo.</p>
+          <img src="core_shield.png" class="glossary-img" alt="Shield Core" onerror="this.style.display='none'">
+        </div>
+
+        <div class="glossary-item">
+          <h4>Magic Shield Core</h4>
+          <p>Magic Shield(Escudo Magico): Es el Bakucore con los bonos de B-Power más altos del juego. Suele requerir condiciones específicas para aprovechar su potencial, como ser utilizado por Bakugan Fusión, o bien ofrecer reducción de coste para Baku-Gears.</p>
+          <img src="core_magic_shield.png" class="glossary-img" alt="Magic Shield Core" onerror="this.style.display='none'">
+        </div>
+
+        <div class="glossary-item">
+          <h4>Fist Core</h4>
+          <p>Fist (Puño Verde): Es un Bakucore orientado a variaciones leves de estadísticas. Sus valores base de B-Power y Daño suelen ser bajos, pero aporta beneficios o buffs específicos para ciertas facciones.</p>
+          <img src="core_fist.png" class="glossary-img" alt="Fist Core" onerror="this.style.display='none'">
+        </div>
+
+        <div class="glossary-item">
+          <h4>Fire Fist Core</h4>
+          <p>Fire Fist (Puño Rojo o Puño de Fuego): Funciona como una variante más agresiva del Fist, ofreciendo mayores incrementos en Daño o B-Power.</p>
+          <img src="core_fire_fist.png" class="glossary-img" alt="Fire Fist Core" onerror="this.style.display='none'">
+        </div>
+
+        <div class="glossary-item">
+          <h4>Helix Core</h4>
+          <p>Helix (Helice): Se caracteriza por modificar estadísticas mediante compensación (aumenta un parámetro y reduce otro).</p>
+          <img src="core_helix.png" class="glossary-img" alt="Helix Core" onerror="this.style.display='none'">
+        </div>
+
+        <h4 style="color:var(--neon-magenta); font-family:'Orbitron'; margin: 20px 0 10px 0; font-size: 0.85rem; border-bottom: 1px solid var(--neon-magenta); padding-bottom: 4px;">MECÁNICAS STRIKE</h4>
+
+        <div class="glossary-item">
+          <h4>FrostStrike</h4>
+          <p>Establece un coste de energía adicional que el oponente debe pagar si desea jugar cartas Flip para detener o negar el daño tras la fase de cálculo.</p>
+          <img src="strike_frost.png" class="glossary-img" alt="FrostStrike" onerror="this.style.display='none'">
+        </div>
+
+        <div class="glossary-item">
+          <h4>ShadowStrike</h4>
+          <p>Otorga inmunidad total contra reducciones de estadísticas por parte de cartas de habilidad, Bakucores o efectos del oponente durante el combate.</p>
+          <img src="strike_shadow.png" class="glossary-img" alt="ShadowStrike" onerror="this.style.display='none'">
+        </div>
+
+        <div class="glossary-item">
+          <h4>DobleStrike</h4>
+          <p>Es un multiplicador de impacto directo. Multiplica por dos (2x) el daño total generado por el Bakugan antes de aplicarlo al rival.</p>
+          <img src="strike_double.png" class="glossary-img" alt="DobleStrike" onerror="this.style.display='none'">
+        </div>
+
+        <h4 style="color:var(--neon-magenta); font-family:'Orbitron'; margin: 20px 0 10px 0; font-size: 0.85rem; border-bottom: 1px solid var(--neon-magenta); padding-bottom: 4px;">SÍMBOLOS Y EFECTOS</h4>
+
+        <div class="glossary-item">
+          <h4>Reroll</h4>
+          <p>Otorga la posibilidad de volver a lanzar tu Bakugan durante el turno en curso si el lanzamiento inicial fue fallido.</p>
+          <img src="logo_reroll.png" class="glossary-img" alt="Reroll" onerror="this.style.display='none'">
+        </div>
+
+        <div class="glossary-item">
+          <h4>Negar Core</h4>
+          <p>Anula completamente el BakuCore obtenido por el rival en esa ronda, cancelando tanto sus valores de B-Power/Daño como cualquier efecto secundario.</p>
+          <img src="logo_negar_core.png" class="glossary-img" alt="Negar Core" onerror="this.style.display='none'">
+        </div>
+
+        <div class="glossary-item">
+          <h4>Sumar Core</h4>
+          <p>Permite tomar un BakuCore adicional directamente desde la Matrix y equiparlo a tu Bakugan activo.</p>
+          <img src="logo_sumar_core.png" class="glossary-img" alt="Sumar Core" onerror="this.style.display='none'">
+        </div>
+
+        <div class="glossary-item">
+          <h4>Robar Core</h4>
+          <p>Retira el BakuCore que el rival haya reclamado en ese turno y lo transfiere a tu propio Bakugan activo.</p>
+          <img src="logo_robar_core.png" class="glossary-img" alt="Robar Core" onerror="this.style.display='none'">
+        </div>
+
+        <div class="glossary-item">
+          <h4>Energía</h4>
+          <p>Representa el coste en puntos de energía necesarios para jugar las cartas de tu mano.</p>
+          <img src="logo_energia.png" class="glossary-img" alt="Energía" onerror="this.style.display='none'">
+        </div>
+
+        <div class="glossary-item">
+          <h4>Baku-Gear</h4>
+          <p>Identifica a las cartas de equipamiento o armamento. Otorga una reducción de -2 de energía al coste de jugar un Baku-Gear.</p>
+          <img src="logo_bakugear.png" class="glossary-img" alt="Baku-Gear" onerror="this.style.display='none'">
+        </div>
+
+        <div class="glossary-item">
+          <h4>Doble Baku-Gear</h4>
+          <p>Indica que dicha carta puede equiparse como un segundo Baku-Gear en un mismo Bakugan.</p>
+          <img src="logo_doble_bakugear.png" class="glossary-img" alt="Doble Baku-Gear" onerror="this.style.display='none'">
+        </div>
+
+        <div class="glossary-item">
+          <h4>Stop</h4>
+          <p>Permite frenar y cancelar el ataque en curso del oponente tras la fase de cálculo de daño.</p>
+          <img src="logo_stop.png" class="glossary-img" alt="Stop" onerror="this.style.display='none'">
+        </div>
+
+        <div class="glossary-item">
+          <h4>Fusión</h4>
+          <p>Permite voltear la carta del Bakugan para transformarlo en su versión Fusionada,al hacerlo este obtiene nuevas estadísticas.</p>
+          <img src="logo_fusion.png" class="glossary-img" alt="Fusión" onerror="this.style.display='none'">
+        </div>
+
+        <div class="glossary-item">
+          <h4>Team Attack</h4>
+          <p>Permite ejecutar un ataque combinado sumando el Daño total de tus tres Bakugan en un solo impacto.</p>
+          <img src="logo_team_attack.png" class="glossary-img" alt="Team Attack" onerror="this.style.display='none'">
+        </div>
+
+        <div class="glossary-item">
+          <h4>Victor</h4>
+          <p>Se activa únicamente si tu Bakugan se declara ganador de la ronda, desencadenando los efectos que acompañen a este icono.</p>
+          <img src="logo_victor.png" class="glossary-img" alt="Victor" onerror="this.style.display='none'">
+        </div>
+
+        <div class="glossary-item">
+          <h4>Evolución Diamante</h4>
+          <p>Identifica que la carta pertenece a la línea evolutiva de un Bakugan de variante Diamante.</p>
+          <img src="logo_diamante.png" class="glossary-img" alt="Evolución Diamante" onerror="this.style.display='none'">
+        </div>
+
+        <div class="glossary-item">
+          <h4>Escanear (Scan)</h4>
+          <p>Permite mirar la carta superior de tu Deck. Tras revisarla, puedes dejarla arriba o enviarla al fondo.</p>
+          <img src="logo_escanear.png" class="glossary-img" alt="Escanear" onerror="this.style.display='none'">
+        </div>
+
+        <div class="glossary-item">
+          <h4>Robar Carta</h4>
+          <p>Representa la acción de tomar cartas directamente del tope de tu Deck.</p>
+          <img src="logo_robar_carta.png" class="glossary-img" alt="Robar Carta" onerror="this.style.display='none'">
+        </div>
+
+        <h4 style="color:var(--neon-magenta); font-family:'Orbitron'; margin: 20px 0 10px 0; font-size: 0.85rem; border-bottom: 1px solid var(--neon-magenta); padding-bottom: 4px;">FACCIONES</h4>
+
+        <div class="glossary-item">
+          <h4>Pyrus</h4>
+          <p>Rápido, agresivo y explosivo. Genera energía adicional y aplica daño masivo al rival.</p>
+          <img src="faccion_pyrus.png" class="glossary-img" alt="Pyrus" onerror="this.style.display='none'">
+        </div>
+
+        <div class="glossary-item">
+          <h4>Aquos</h4>
+          <p>Táctico y de interrupción. Manipula a los Bakugan rivales y niega o anula jugadas.</p>
+          <img src="faccion_aquos.png" class="glossary-img" alt="Aquos" onerror="this.style.display='none'">
+        </div>
+
+        <div class="glossary-item">
+          <h4>Ventus</h4>
+          <p>Control de energía y manipulación. Genera recursos rápidamente y debilita (debuff) al rival.</p>
+          <img src="faccion_ventus.png" class="glossary-img" alt="Ventus" onerror="this.style.display='none'">
+        </div>
+
+        <div class="glossary-item">
+          <h4>Aurelus</h4>
+          <p>Versatilidad. Bakugan con altas estadísticas base sin requerir muchas cartas de su propia facción.</p>
+          <img src="faccion_aurelus.png" class="glossary-img" alt="Aurelus" onerror="this.style.display='none'">
+        </div>
+
+        <div class="glossary-item">
+          <h4>Haos</h4>
+          <p>Control, precisión y Dominio. Se potencia según la cantidad de BakuCores y Héroes en juego.</p>
+          <img src="faccion_haos.png" class="glossary-img" alt="Haos" onerror="this.style.display='none'">
+        </div>
+
+        <div class="glossary-item">
+          <h4>Darkus</h4>
+          <p>Riesgo y recompensa. Descarta cartas para efectos poderosos y controla la mano rival.</p>
+          <img src="faccion_darkus.png" class="glossary-img" alt="Darkus" onerror="this.style.display='none'">
+        </div>
+
+        <div class="glossary-item">
+          <h4>All-Faction</h4>
+          <p>Cualquier Bakugan de esta facción sirve para reemplazar cualquier facción para completar un equipo.</p>
+          <img src="faccion_all-faction.png" class="glossary-img" alt="All-Faction" onerror="this.style.display='none'">
+        </div>
+
+      </div>
+    </div>
+
+
+    <!-- ===== ADMINISTRADOR ===== -->
+    <div class="section" id="sec-admin">
+      <div class="panel panel-admin">
+        <h3 style="font-family:'Orbitron';color:var(--neon-magenta);margin-bottom:12px;font-size:0.9rem;" id="news-form-title">PUBLICAR NOTICIA</h3>
+        <input type="hidden" id="news-id" value="" />
+        
+        <label for="news-title-input">Título de la Noticia</label>
+        <input type="text" id="news-title-input" placeholder="Ej: ¡Nuevo Torneo este Fin de Semana!" />
+
+        <label for="news-body-input">Mensaje / Contenido</label>
+        <textarea id="news-body-input" rows="4" placeholder="Escribe el mensaje del comunicado..."></textarea>
+
+        <label for="news-image-input">Adjuntar Imagen desde Dispositivo</label>
+        <input type="file" id="news-image-input" accept="image/*" style="padding:6px; font-size:0.85rem;" />
+        <div id="image-preview-container" style="display:none; margin-bottom:12px; text-align:center;">
+          <img id="image-preview" src="" style="max-width:100%; max-height:150px; border-radius:8px; border:1px solid var(--neon-magenta);" />
+          <button class="btn btn-sm btn-danger" style="margin-top:6px;" onclick="removeNewsImage()">Quitar Imagen</button>
+        </div>
+
+        <div style="display:flex; gap:8px;">
+          <button class="btn" onclick="saveNews()">PUBLICAR NOTICIA</button>
+          <button class="btn btn-danger" id="cancel-news-btn" style="display:none;" onclick="resetNewsForm()">CANCELAR</button>
+        </div>
+      </div>
+
+      <div class="panel panel-admin">
+        <h3 style="font-family:'Orbitron';color:var(--neon-magenta);margin-bottom:12px;font-size:0.9rem;">ADMINISTRAR NOTICIAS</h3>
+        <div id="admin-news-list">
+          <p style="font-size:0.8rem; opacity:0.6;">Cargando lista de noticias...</p>
+        </div>
+      </div>
+
+      <div class="panel panel-admin">
+        <h3 style="font-family:'Orbitron';color:var(--neon-magenta);margin-bottom:12px;font-size:0.9rem;">PANEL DE CONTROL (GAME MASTER)</h3>
+        <p style="font-size:0.8rem; opacity:0.8; margin-bottom:12px;">Administra los resultados de las partidas y el estado general de la liga.</p>
+        
+        <div style="overflow-x:auto;">
+          <table class="rank-table">
+            <thead>
+              <tr>
+                <th>JUGADOR</th>
+                <th>V / D</th>
+                <th>PUNTOS</th>
+                <th>ACCIONES</th>
+              </tr>
+            </thead>
+            <tbody id="admin-players-body"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="panel panel-admin" style="text-align:center;">
+        <h3 style="font-family:'Orbitron';color:#ff0055;margin-bottom:8px;font-size:0.85rem;">REINICIO DE TEMPORADA</h3>
+        <p style="font-size:0.8rem; opacity:0.75; margin-bottom:12px;">Esta acción pondrá a <strong>0</strong> las victorias, derrotas y puntos de TODOS los jugadores registrados.</p>
+        <button class="btn btn-danger" onclick="resetSeason()">⚠️ REINICIAR PUNTOS DE LA LIGA</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ============ VENTANA MODAL FLOTANTE (PERFIL BRAWLER) ============ -->
+<div class="modal-overlay" id="player-modal-overlay" onclick="closePlayerModal(event)">
+  <div class="modal-card">
+    <button class="modal-close-btn" onclick="closePlayerModalDirect()">✕</button>
+    
+    <div class="profile-avatar-hex-container">
+      <img id="modal-avatar" src="" class="player-avatar-hex" alt="Avatar Brawler">
+    </div>
+
+    <div id="modal-nick" class="modal-brawler-nick">---</div>
+
+    <div class="modal-rank-container">
+      <img id="modal-rank-img" src="" class="modal-rank-img" alt="Rango">
+      <span id="modal-rank-title" class="modal-rank-title">---</span>
+    </div>
+
+    <div class="modal-section-title">⚡ Bakugan Registrados</div>
+    <div class="modal-bakugan-list" id="modal-bakugan-list"></div>
+
+    <div class="modal-section-title">🔥 Facciones Preferidas</div>
+    <div class="modal-factions-container" id="modal-factions-list"></div>
+  </div>
+</div>
+
+<!-- PERSONAJE GUÍA FLOTANTE -->
+<div id="guide-character" class="active">
+  <div class="speech-bubble" id="guide-bubble" style="display:none;"></div>
+  <div style="position:relative;">
+    <div class="char-wrapper" id="char-box" onclick="toggleGuideHelp()">
+      <img src="Lady_fenne_04.png" class="char-img" id="guide-img" alt="Guía Mascot">
+    </div>
+    <div class="help-btn" id="help-btn" style="display:none;" onclick="toggleGuideHelp()">?</div>
+  </div>
+</div>
+
+<!-- FIREBASE SDK -->
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+<!-- ===== PANEL / MODAL DE DUELO ===== -->
+<div id="duel-modal" class="modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:10000; justify-content:center; align-items:center;">
+  <div class="panel" style="max-width:400px; width:90%; border:1px solid var(--neon-cyan); box-shadow:0 0 20px rgba(0,240,255,0.3); text-align:center;">
+    
+    <h3 style="font-family:'Orbitron'; color:var(--neon-cyan); margin-bottom:15px;">⚔️ ARENA DE DUELO TCG</h3>
+
+    <!-- PASO 1: Vincular Sala -->
+    <div id="duel-setup">
+      <p style="font-size:0.85rem; margin-bottom:10px;">Crea una sala o ingresa el código del oponente para vincular la partida:</p>
+      
+      <div style="display:flex; gap:8px; margin-bottom:15px; justify-content:center;">
+        <button class="btn btn-sm" onclick="generateRoomCode()">🎲 Crear Código</button>
+      </div>
+
+      <input type="text" id="room-code-input" placeholder="Código de Sala (Ej: BK-1234)" style="width:100%; text-align:center; font-family:'Orbitron'; letter-spacing:2px; padding:8px; margin-bottom:15px; text-transform:uppercase;">
+
+      <button class="btn" style="width:100%;" onclick="startDuelSession()">🚀 INICIAR COMBATE</button>
+      <button class="btn btn-danger btn-sm" style="margin-top:10px; width:100%;" onclick="closeDuelModal()">Cancelar</button>
+    </div>
+
+    <!-- PASO 2: HUD / Tablero de Contadores -->
+    <div id="duel-arena" style="display:none;">
+      
+      <div style="font-family:'Orbitron'; color:var(--neon-magenta); font-size:0.8rem; margin-bottom:10px;">
+        SALA: <span id="display-room-code" style="color:var(--neon-cyan);">---</span>
+      </div>
+
+      <!-- Contadores de Vida / Deck -->
+      <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-bottom:15px;">
+        
+        <!-- Tú (Jugador 1) -->
+        <div style="background:rgba(0,240,255,0.05); padding:10px; border-radius:8px; border:1px solid rgba(0,240,255,0.2);">
+          <div style="font-size:0.75rem; color:var(--neon-cyan); margin-bottom:5px;">TU DECK</div>
+          <div id="p1-deck" style="font-family:'Orbitron'; font-size:2rem; font-weight:bold; color:#fff;">50</div>
+          
+          <div style="display:flex; gap:4px; justify-content:center; margin-top:8px;">
+            <button class="btn btn-sm btn-danger" onclick="updateDeck('p1', -1)">-1</button>
+            <button class="btn btn-sm btn-danger" onclick="updateDeck('p1', -5)">-5</button>
+            <button class="btn btn-sm" onclick="updateDeck('p1', 1)">+1</button>
+          </div>
+        </div>
+
+        <!-- Oponente (Jugador 2) -->
+        <div style="background:rgba(255,0,85,0.05); padding:10px; border-radius:8px; border:1px solid rgba(255,0,85,0.2);">
+          <div style="font-size:0.75rem; color:var(--neon-magenta); margin-bottom:5px;" id="p2-name">OPONENTE</div>
+          <div id="p2-deck" style="font-family:'Orbitron'; font-size:2rem; font-weight:bold; color:#fff;">50</div>
+          
+          <div style="display:flex; gap:4px; justify-content:center; margin-top:8px;">
+            <button class="btn btn-sm btn-danger" onclick="updateDeck('p2', -1)">-1</button>
+            <button class="btn btn-sm btn-danger" onclick="updateDeck('p2', -5)">-5</button>
+            <button class="btn btn-sm" onclick="updateDeck('p2', 1)">+1</button>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Botón Dinámico (Mano Inicial -> Nuevo Turno) -->
+      <button id="btn-main-action" class="btn" style="width:100%; margin-bottom:10px; font-weight:bold; background:linear-gradient(45deg, #ff9900, #ff0055);" onclick="handleMainActionButton()">
+        🎴 Robar Mano Inicial (-6)
+      </button>
+
+      <button class="btn btn-danger btn-sm" style="width:100%;" onclick="closeDuelModal()">Rendirse / Salir</button>
+    </div>
+
+  </div>
+</div>
+
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyCdu3MZhDL8OqIlBlUxJOwqLRQP4A4C570",
+  authDomain: "liga-bakugan.firebaseapp.com",
+  projectId: "liga-bakugan",
+  storageBucket: "liga-bakugan.firebasestorage.app",
+  messagingSenderId: "937923502730",
+  appId: "1:937923502730:web:2cf8966e74c8449ca34373",
+  measurementId: "G-97PV4B7K0X"
+};
+
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+
+const ADMIN_PIN = '4170';
+
+const AVATARS = [
+  'dragonoid_diamante_icon.jpg',
+  'Cyndeous_sworld_icon.jpg',
+  'Cyndeous_icon.jpg',
+  'fangzor_mantonoid_icon.jpg',
+  'dragonoid_flame_icon.jpg',
+  'Fenneca_icon.jpg',
+  'trox_icon.jpg',
+  'hydranoid_icon.jpg',
+  'mantonoid_icon.jpg',
+  'platinum_pharol_icon.jpg',
+  'wrath_diamont_icon.jpg',
+  'serpillious_icon.jpg'
+];
+
+const GUIDE_POSES = [
+  'Lady_fenne_04.png',
+  'Lady_fenne_01.png',
+  'Lady_fenne_01.png',
+  'Lady_fenne_02.png',
+  'Lady_fenne_01.png',
+  'Lady_fenne_03.png'
+];
+
+const GUIDE_MINI = 'Lady_fenne_icono.png'; 
+
+let currentUserId = localStorage.getItem('bakugan_my_user_id') || null;
+let selectedAvatarPath = AVATARS[0];
+let players = [];
+let newsList = [];
+let guideStep = 0;
+let guideFinished = false;
+let isAdminMode = false;
+let currentImageData = "";
+let isAppInitialized = false;
+
+function listenToDatabase() {
+  db.collection("players").onSnapshot((snapshot) => {
+    players = [];
+    snapshot.forEach((doc) => {
+      players.push(doc.data());
+    });
+
+    renderRanking();
+
+    if (currentUserId && !isAppInitialized) {
+      let existingUser = players.find(p => p.id === currentUserId);
+      if (existingUser) {
+        isAppInitialized = true;
+        enterApp();
+      }
+    }
+
+    if (currentUserId) {
+      renderProfile();
+    }
+    if (isAdminMode) {
+      renderAdminPanel();
+    }
+  });
+
+  db.collection("news").onSnapshot((snapshot) => {
+    newsList = [];
+    snapshot.forEach((doc) => {
+      newsList.push({ id: doc.id, ...doc.data() });
+    });
+    newsList.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+    renderNews();
+    if (isAdminMode) {
+      renderAdminNewsList();
+    }
+  });
+}
+
+function saveUserToCloud(user) {
+  return db.collection("players").doc(user.id).set(user);
+}
+
+function recalculatePoints(player) {
+  const pts = ((player.wins || 0) * 50) - ((player.losses || 0) * 25);
+  player.points = Math.max(0, pts);
+}
+
+function getRank(points) {
+  if (points >= 3500) return { name: 'Rey de Batallas', cls: 'rank-rey', badge: 'Insignea_rey_07.png' };
+  if (points >= 1600) return { name: 'Diamante', cls: 'rank-diamante', badge: 'Insignea_platino_05.png' };
+  if (points >= 1000) return { name: 'Oro', cls: 'rank-oro', badge: 'Insignea_Oro_04.png' };
+  if (points >= 500)  return { name: 'Plata', cls: 'rank-plata', badge: 'Insignea_plata_03.png' };
+  if (points >= 200)  return { name: 'Bronce', cls: 'rank-bronce', badge: 'Insignea_bronce_02.png' };
+  return { name: 'Novato', cls: 'rank-novato', badge: 'Insignea_Novato_01.png' };
+}
+
+function generateId() {
+  return 'BK-' + Math.random().toString(36).substr(2, 6).toUpperCase();
+}
+
+function buildAvatarGrid() {
+  const grid = document.getElementById('avatar-grid');
+  if (!grid) return;
+  grid.innerHTML = '';
+
+  AVATARS.forEach((src) => {
+    const img = document.createElement('img');
+    img.src = src;
+    img.className = 'avatar-opt' + (selectedAvatarPath === src ? ' selected' : '');
+    img.onclick = () => {
+      document.querySelectorAll('.avatar-opt').forEach(a => a.classList.remove('selected'));
+      img.classList.add('selected');
+      selectedAvatarPath = src;
+      const profileImg = document.getElementById('profile-avatar');
+      if (profileImg) profileImg.src = src;
+    };
+    grid.appendChild(img);
+  });
+}
+
+async function startRegistration() {
+  const nick = document.getElementById('nick-input').value.trim();
+  if (!nick) {
+    alert('¡Escribe tu Nick-name!');
+    return;
+  }
+
+  let user = players.find(p => p.nick && p.nick.toLowerCase() === nick.toLowerCase());
+  if (!user) {
+    user = {
+      id: generateId(),
+      nick: nick,
+      contact: '',
+      factions: [],
+      avatar: selectedAvatarPath || AVATARS[0],
+      bakugan: ['', '', ''],
+      wins: 0,
+      losses: 0,
+      points: 0
+    };
+  } else {
+    if (selectedAvatarPath) user.avatar = selectedAvatarPath;
+  }
+
+  currentUserId = user.id;
+  localStorage.setItem('bakugan_my_user_id', currentUserId);
+  await saveUserToCloud(user);
+  enterApp();
+}
+
+function enterApp() {
+  document.getElementById('welcome-screen').classList.add('hidden');
+  document.getElementById('main-app').style.display = 'flex';
+  buildAvatarGrid();
+  renderProfile();
+  renderRanking();
+  renderNews();
+  switchTab('perfil');
+  startGuide();
+}
+
+function renderProfile() {
+  let user = players.find(p => p.id === currentUserId);
+  if (!user) {
+    user = {
+      id: currentUserId || generateId(),
+      nick: 'Brawler',
+      avatar: AVATARS[0],
+      points: 0, wins: 0, losses: 0, bakugan: ['','','']
+    };
+  }
+
+  selectedAvatarPath = user.avatar || AVATARS[0];
+  
+  const profileAvatar = document.getElementById('profile-avatar');
+  if (profileAvatar) profileAvatar.src = selectedAvatarPath;
+
+  document.getElementById('profile-nick-display').textContent = user.nick || 'Brawler';
+  document.getElementById('nick-edit-input').value = user.nick || '';
+  document.getElementById('profile-id').textContent = 'ID: ' + (user.id || '---');
+  document.getElementById('contact-input').value = user.contact || '';
+
+  const sel = document.getElementById('faction-select');
+  if (sel) {
+    Array.from(sel.options).forEach(opt => {
+      opt.selected = (user.factions || []).includes(opt.value);
+    });
+  }
+
+  const baku = user.bakugan || ['', '', ''];
+  document.getElementById('baku1').value = baku[0] || '';
+  document.getElementById('baku2').value = baku[1] || '';
+  document.getElementById('baku3').value = baku[2] || '';
+
+  const rank = getRank(user.points || 0);
+  document.getElementById('stat-points').textContent = user.points || 0;
+  document.getElementById('stat-rank').textContent = rank.name;
+  
+  const rankBadgeImg = document.getElementById('stat-rank-badge');
+  if (rankBadgeImg) rankBadgeImg.src = rank.badge;
+
+  document.getElementById('stat-wins').textContent = user.wins || 0;
+  document.getElementById('stat-losses').textContent = user.losses || 0;
+
+  buildAvatarGrid();
+}
+
+async function saveProfile() {
+  let user = players.find(p => p.id === currentUserId);
+  if (!user) {
+    user = { id: currentUserId || generateId(), wins: 0, losses: 0, points: 0 };
+  }
+
+  const newNick = document.getElementById('nick-edit-input').value.trim();
+  if (!newNick) {
+    alert('El Nickname no puede quedar vacío.');
+    return;
+  }
+
+  user.nick = newNick;
+  user.contact = document.getElementById('contact-input').value.trim();
+  user.avatar = selectedAvatarPath;
+
+  const sel = document.getElementById('faction-select');
+  user.factions = Array.from(sel.selectedOptions).map(o => o.value);
+  
+  user.bakugan = [
+    document.getElementById('baku1').value.trim(),
+    document.getElementById('baku2').value.trim(),
+    document.getElementById('baku3').value.trim()
+  ];
+
+  await saveUserToCloud(user);
+  showGuideMessage('¡Perfil actualizado en la nube, Brawler!');
+}
+
+/* =====================================================
+   RANKING Y VENTANA MODAL FLOTANTE
+===================================================== */
+function renderRanking() {
+  const tbody = document.getElementById('rank-body');
+  if (!tbody) return;
+
+  const sorted = [...players].sort((a, b) => (b.points || 0) - (a.points || 0));
+  tbody.innerHTML = '';
+
+  sorted.forEach((p, i) => {
+    const rank = getRank(p.points || 0);
+    const tr = document.createElement('tr');
+    tr.className = 'rank-row-interactive';
+    tr.onclick = () => openPlayerModal(p.id); // Abre la tarjeta flotante
+
+    tr.innerHTML = `
+      <td>${i + 1}</td>
+      <td><img src="${p.avatar || AVATARS[0]}" class="player-avatar" alt="Avatar"></td>
+      <td><strong>${escapeHtml(p.nick || 'Brawler')}</strong><br><small style="opacity:0.5">${p.id}</small></td>
+      <td style="color:var(--neon-cyan); font-weight:600;">${p.points || 0}</td>
+      <td>${p.wins || 0}/${p.losses || 0}</td>
+      <td>
+        <span class="rank-badge ${rank.cls}">
+          <img src="${rank.badge}" class="rank-badge-img-table" alt="Badge">
+          <span>${rank.name}</span>
+        </span>
+      </td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+function openPlayerModal(playerId) {
+  const p = players.find(item => item.id === playerId);
+  if (!p) return;
+
+  const rank = getRank(p.points || 0);
+
+  document.getElementById('modal-avatar').src = p.avatar || AVATARS[0];
+  document.getElementById('modal-nick').textContent = p.nick || 'Brawler';
+  document.getElementById('modal-rank-img').src = rank.badge;
+  
+  const rankTitle = document.getElementById('modal-rank-title');
+  rankTitle.textContent = rank.name;
+  rankTitle.style.color = rank.cls === 'rank-rey' ? '#ff00ff' : (rank.cls === 'rank-diamante' ? '#00e5ff' : '#00f0ff');
+
+  // Renderizar Bakugans
+  const bakuContainer = document.getElementById('modal-bakugan-list');
+  bakuContainer.innerHTML = '';
+  const bakugans = p.bakugan || [];
+  let hasBaku = false;
+  
+  bakugans.forEach((b, idx) => {
+    if (b && b.trim() !== '') {
+      hasBaku = true;
+      const div = document.createElement('div');
+      div.className = 'modal-bakugan-item';
+      div.textContent = `🐉 #${idx + 1}: ${b}`;
+      bakuContainer.appendChild(div);
+    }
+  });
+
+  if (!hasBaku) {
+    bakuContainer.innerHTML = '<div style="font-size:0.75rem; opacity:0.5;">Sin Bakugan registrados</div>';
+  }
+
+  // Renderizar Facciones
+  const facContainer = document.getElementById('modal-factions-list');
+  facContainer.innerHTML = '';
+  const factions = p.factions || [];
+
+  if (factions.length > 0) {
+    factions.forEach(f => {
+      const span = document.createElement('span');
+      span.className = 'modal-faction-tag';
+      span.textContent = f;
+      facContainer.appendChild(span);
+    });
+  } else {
+    facContainer.innerHTML = '<div style="font-size:0.75rem; opacity:0.5;">Sin facciones seleccionadas</div>';
+  }
+
+  document.getElementById('player-modal-overlay').classList.add('active');
+}
+
+function closePlayerModal(e) {
+  if (e.target.classList.contains('modal-overlay')) {
+    closePlayerModalDirect();
+  }
+}
+
+function closePlayerModalDirect() {
+  document.getElementById('player-modal-overlay').classList.remove('active');
+}
+
+/* =====================================================
+   SISTEMA DE NOTICIAS
+===================================================== */
+function renderNews(listToRender = newsList) {
+  const container = document.getElementById('news-container');
+  if (!container) return;
+
+  if (listToRender.length === 0) {
+    container.innerHTML = '<p style="text-align:center; opacity:0.6; font-size:0.85rem;">No hay noticias que coincidan con la búsqueda.</p>';
+    return;
+  }
+
+  container.innerHTML = '';
+  listToRender.forEach(item => {
+    const card = document.createElement('div');
+    card.className = 'news-card';
+
+    let html = `<div class="news-title">${escapeHtml(item.title || 'Comunicado')}</div>`;
+    html += `<span class="news-date">${item.date || ''}</span>`;
+    html += `<div class="news-body">${escapeHtml(item.body || '')}</div>`;
+
+    if (item.image) {
+      html += `<img src="${item.image}" class="news-img" alt="Noticia" />`;
+    }
+
+    card.innerHTML = html;
+    container.appendChild(card);
+  });
+}
+
+function filterNews() {
+  const query = document.getElementById('news-search-input').value.toLowerCase().trim();
+  if (!query) {
+    renderNews(newsList);
+    return;
+  }
+  const filtered = newsList.filter(n => 
+    (n.title && n.title.toLowerCase().includes(query)) || 
+    (n.body && n.body.toLowerCase().includes(query))
+  );
+  renderNews(filtered);
+}
+
+document.getElementById('news-image-input')?.addEventListener('change', function(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = function(event) {
+    const img = new Image();
+    img.onload = function() {
+      const canvas = document.createElement('canvas');
+      let width = img.width;
+      let height = img.height;
+      
+      const max_size = 800;
+      if (width > height) {
+        if (width > max_size) {
+          height *= max_size / width;
+          width = max_size;
+        }
+      } else {
+        if (height > max_size) {
+          width *= max_size / height;
+          height = max_size;
+        }
+      }
+      canvas.width = width;
+      canvas.height = height;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0, width, height);
+      
+      currentImageData = canvas.toDataURL('image/jpeg', 0.7);
+      document.getElementById('image-preview').src = currentImageData;
+      document.getElementById('image-preview-container').style.display = 'block';
+    }
+    img.src = event.target.result;
+  }
+  reader.readAsDataURL(file);
+});
+
+function removeNewsImage() {
+  currentImageData = "";
+  document.getElementById('news-image-input').value = "";
+  document.getElementById('image-preview-container').style.display = 'none';
+}
+
+async function saveNews() {
+  const newsId = document.getElementById('news-id').value;
+  const title = document.getElementById('news-title-input').value.trim();
+  const body = document.getElementById('news-body-input').value.trim();
+
+  if (!title || !body) {
+    alert('Por favor completa el título y el mensaje de la noticia.');
+    return;
+  }
+
+  const newsData = {
+    title: title,
+    body: body,
+    image: currentImageData,
+    date: new Date().toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }),
+    timestamp: Date.now()
+  };
+
+  try {
+    if (newsId) {
+      await db.collection("news").doc(newsId).update(newsData);
+      alert('¡Noticia actualizada exitosamente!');
+    } else {
+      await db.collection("news").add(newsData);
+      alert('¡Noticia publicada exitosamente!');
+    }
+    resetNewsForm();
+  } catch (error) {
+    console.error("Error al guardar la noticia: ", error);
+  }
+}
+
+function resetNewsForm() {
+  document.getElementById('news-id').value = '';
+  document.getElementById('news-title-input').value = '';
+  document.getElementById('news-body-input').value = '';
+  document.getElementById('news-form-title').textContent = 'PUBLICAR NOTICIA';
+  document.getElementById('cancel-news-btn').style.display = 'none';
+  removeNewsImage();
+}
+
+function editNews(id) {
+  const item = newsList.find(n => n.id === id);
+  if (!item) return;
+
+  document.getElementById('news-id').value = item.id;
+  document.getElementById('news-title-input').value = item.title || '';
+  document.getElementById('news-body-input').value = item.body || '';
+  document.getElementById('news-form-title').textContent = 'EDITAR NOTICIA';
+  document.getElementById('cancel-news-btn').style.display = 'inline-block';
+
+  if (item.image) {
+    currentImageData = item.image;
+    document.getElementById('image-preview').src = item.image;
+    document.getElementById('image-preview-container').style.display = 'block';
+  } else {
+    removeNewsImage();
+  }
+
+  document.getElementById('news-form-title').scrollIntoView({ behavior: 'smooth' });
+}
+
+async function deleteNews(id) {
+  if (!confirm('¿Estás seguro de que deseas eliminar esta noticia?')) return;
+  try {
+    await db.collection("news").doc(id).delete();
+  } catch (error) {
+    console.error("Error al eliminar noticia: ", error);
+  }
+}
+
+function renderAdminNewsList() {
+  const container = document.getElementById('admin-news-list');
+  if (!container) return;
+
+  if (newsList.length === 0) {
+    container.innerHTML = '<p style="font-size:0.8rem; opacity:0.6;">No hay noticias creadas.</p>';
+    return;
+  }
+
+  container.innerHTML = '';
+  newsList.forEach(item => {
+    const div = document.createElement('div');
+    div.style.background = 'rgba(0,10,25,0.6)';
+    div.style.border = '1px solid rgba(0,240,255,0.2)';
+    div.style.padding = '8px 12px';
+    div.style.borderRadius = '6px';
+    div.style.marginBottom = '8px';
+    div.style.display = 'flex';
+    div.style.justifyContent = 'space-between';
+    div.style.alignItems = 'center';
+
+    div.innerHTML = `
+      <div style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:60%;">
+        <strong>${escapeHtml(item.title)}</strong><br>
+        <small style="opacity:0.6">${item.date || ''}</small>
+      </div>
+      <div style="display:flex; gap:4px;">
+        <button class="btn btn-sm" onclick="editNews('${item.id}')">✏️ EDITAR</button>
+        <button class="btn btn-sm btn-danger" onclick="deleteNews('${item.id}')">🗑️ ELIMINAR</button>
+      </div>
+    `;
+    container.appendChild(div);
+  });
+}
+
+function escapeHtml(text) {
+  const div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML;
+}
+
+/* =====================================================
+   ADMINISTRADOR
+===================================================== */
+function promptAdminAccess() {
+  if (isAdminMode) {
+    alert('Ya te encuentras en Modo Administrador.');
+    switchTab('admin');
+    return;
+  }
+
+  const pass = prompt('Ingrese el PIN de ADMINISTRADOR:');
+  if (pass === ADMIN_PIN) {
+    isAdminMode = true;
+    document.getElementById('tab-admin-btn').style.display = 'block';
+    renderAdminPanel();
+    renderAdminNewsList();
+    switchTab('admin');
+    alert('¡Modo Game Master Activado!');
+  } else if (pass !== null) {
+    alert('PIN incorrecto. Acceso denegado.');
+  }
+}
+
+function renderAdminPanel() {
+  const tbody = document.getElementById('admin-players-body');
+  if (!tbody) return;
+
+  tbody.innerHTML = '';
+
+  players.forEach((p) => {
+    const tr = document.createElement('tr');
+
+    tr.innerHTML = `
+      <td><strong>${escapeHtml(p.nick || 'Brawler')}</strong><br><small style="opacity:0.6">${p.id}</small></td>
+      <td>${p.wins || 0} V / ${p.losses || 0} D</td>
+      <td style="color:var(--neon-cyan);">${p.points || 0}</td>
+      <td style="display:flex; gap:4px; flex-wrap:wrap;">
+        <button class="btn btn-sm" onclick="adminMatchChange('${p.id}', 'win', 1)">+V</button>
+        <button class="btn btn-sm" onclick="adminMatchChange('${p.id}', 'win', -1)">-V</button>
+        <button class="btn btn-sm btn-danger" onclick="adminMatchChange('${p.id}', 'loss', 1)">+D</button>
+        <button class="btn btn-sm btn-danger" onclick="adminMatchChange('${p.id}', 'loss', -1)">-D</button>
+        <button class="btn btn-sm btn-danger" style="background:#ff0055; color:#fff;" onclick="deletePlayer('${p.id}', '${p.nick || 'Brawler'}')">🗑️</button>
+      </td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+async function adminMatchChange(playerId, type, amount) {
+  const player = players.find(p => p.id === playerId);
+  if (!player) return;
+
+  if (type === 'win') {
+    player.wins = Math.max(0, (player.wins || 0) + amount);
+  } else if (type === 'loss') {
+    player.losses = Math.max(0, (player.losses || 0) + amount);
+  }
+
+  recalculatePoints(player);
+  await saveUserToCloud(player);
+}
+
+async function deletePlayer(playerId, playerNick) {
+  if (!confirm(`⚠️ ¿Deseas eliminar permanentemente a "${playerNick}"?`)) return;
+  try {
+    await db.collection("players").doc(playerId).delete();
+  } catch (error) {
+    console.error("Error al eliminar usuario: ", error);
+  }
+}
+
+async function resetSeason() {
+  if (!confirm('⚠️ ¿Estás SEGURO de que deseas reiniciar la Liga Bakugan?')) return;
+  if (!confirm('🚨 ESTA ACCIÓN NO SE PUEDE DESHACER.')) return;
+
+  const batch = db.batch();
+  players.forEach(p => {
+    p.wins = 0;
+    p.losses = 0;
+    p.points = 0;
+    const docRef = db.collection("players").doc(p.id);
+    batch.update(docRef, { wins: 0, losses: 0, points: 0 });
+  });
+
+  await batch.commit();
+  alert('🔄 ¡La liga en la nube ha sido reiniciada a cero!');
+}
+
+/* =====================================================
+   NAVEGACIÓN DE PESTAÑAS
+===================================================== */
+function switchTab(tabName) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+
+  const targetBtn = document.querySelector(`.tab-btn[data-tab="${tabName}"]`);
+  const targetSec = document.getElementById('sec-' + tabName);
+
+  if (targetBtn) targetBtn.classList.add('active');
+  if (targetSec) targetSec.classList.add('active');
+}
+
+document.querySelectorAll('.tab-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    switchTab(btn.dataset.tab);
+  });
+});
+
+/* =====================================================
+   GUÍA DEL PERSONAJE Y MENÚ FAQ
+===================================================== */
+
+// 1. Estructura de Preguntas y Respuestas (Modifica las preguntas/respuestas aquí en el futuro)
+const FAQ_DATA = [
+  {
+    id: 1,
+    question: "¿Cómo sumo o pierdo puntos en la Liga?",
+    answer: "Cada victoria te suma +50 puntos y cada derrota te resta -25 puntos. ¡Acumula victorias para subir de rango!"
+  },
+  {
+    id: 2,
+    question: "¿Cómo funciona la Arena de Duelo TCG?",
+    answer: "Presiona el botón de duelo (⚔️) en el Ranking, crea o ingresa un código de sala y usen el contador para descontar su mano inicial de 6 cartas y los robos por turno. ¡Al llegar un mazo a 0 se guardará el resultado automáticamente!"
+  },
+  {
+    id: 3,
+    question: "¿Cuáles son los Rangos de la Liga?",
+    answer: "Novato (0-199 pts), Bronce (200-499 pts), Plata (500-999 pts), Oro (1000-1599 pts), Diamante (1600-3499 pts) y Rey de Batallas (3500+ pts)."
+  },
+  {
+    id: 4,
+    question: "¿Qué son los BakuCores y para qué sirven?",
+    answer: "Son fichas que forman el campo de batalla. Al abrir tu Bakugan sobre uno, ganas sus bonificaciones de B-Power o Daño. Existen varios tipos como Shield, Magic Shield, Fist, Fire Fist y Helix."
+  },
+  {
+    id: 5,
+    question: "¿Diferencia entre B-Power y Daño?",
+    answer: "El B-Power define quién gana la ronda de combate (el valor más alto gana). El Daño es la cantidad de cartas que el perdedor debe descartar de su mazo."
+  },
+  {
+    id: 6,
+    question: "¿Qué hacen los efectos Strike?",
+    answer: "FrostStrike encarece las cartas Flip del rival; ShadowStrike evita que te reduzcan estadísticas; y DobleStrike multiplica tu daño total x2."
+  },
+  {
+    id: 7,
+    question: "¿Puedo cambiar mis Bakugan o Avatar?",
+    answer: "¡Sí! Ingresa a 'Perfil', elige un nuevo avatar, modifica tu equipo de 3 Bakugan o tus facciones y presiona 'GUARDAR PERFIL'."
+  },
+  {
+    id: 8,
+    question: "¿Cómo ver el perfil de otro jugador?",
+    answer: "Ve a la pestaña 'Liga' y haz clic directamente sobre el nombre o casilla de cualquier Brawler en la tabla de Ranking."
+  }
+];
+// Diálogo completo de presentación original
+const guideMessages = [
+  '¡Genial que estés aquí, Brawler! Voy a mostrarte un poco la arena.',
+  'En <strong>Perfil</strong> puedes cambiar tu Nick cuando gustes, ver tu ID de jugador y tu contacto registrado.',
+  'También puedes seleccionar tus <strong>Facciones preferidas</strong>, cambiar tu ícono avatar y definir tus <strong>tres Bakugan de equipo</strong>.',
+  'En el apartado <strong>Liga</strong> verás tu posición en el Ranking, tus puntos acumulados y en qué rango te encuentras.',
+  'Revisa el apartado <strong>Noticias</strong> para enterarte de los próximos torneos, eventos y avisos importantes.',
+  'Si eres nuevo en el TCG, tienes un <strong>Glosario</strong> para consultar cuando gustes.',
+  '¡Listo! Ya conoces lo básico. Si necesitas recordar algo, tócalo o pulsa el <strong>?</strong>.'
+];
+
+// Iniciar la presentación completa una sola vez
+function startGuide() {
+  if (guideFinished) return; // Evita repetir el tour inicial si ya concluyó
+
+  guideStep = 0;
+  const box = document.getElementById('char-box');
+  const img = document.getElementById('guide-img');
+  
+  if (box) box.classList.remove('mini');
+  if (img) img.src = GUIDE_POSES[0];
+  document.getElementById('help-btn').style.display = 'none';
+  
+  showNextGuide();
+}
+
+function showNextGuide() {
+  const bubble = document.getElementById('guide-bubble');
+  const img = document.getElementById('guide-img');
+
+  if (guideStep < guideMessages.length) {
+    bubble.innerHTML = guideMessages[guideStep];
+    bubble.style.display = 'block';
+
+    const pose = GUIDE_POSES[guideStep] || GUIDE_POSES[0];
+    if (img) img.src = pose; 
+
+    guideStep++;
+
+    if (guideStep < guideMessages.length) {
+      setTimeout(showNextGuide, 5000); // 5 segundos por bocadillo
+    } else {
+      setTimeout(() => {
+        bubble.style.display = 'none';
+        finishGuide();
+      }, 5500);
+    }
+  }
+}
+
+function finishGuide() {
+  guideFinished = true;
+  const box = document.getElementById('char-box');
+  const img = document.getElementById('guide-img');
+  
+  if (box) box.classList.add('mini');
+  if (img) img.src = GUIDE_MINI;
+  document.getElementById('help-btn').style.display = 'flex';
+}
+
+// Al hacer clic en Lady Fenne o el botón '?'
+function toggleGuideHelp() {
+  const bubble = document.getElementById('guide-bubble');
+  
+  // Si la presentación inicial aún no termina, no interrumpe la secuencia
+  if (!guideFinished) return;
+
+  // Si el bocadillo está abierto, lo cierra; si está cerrado, abre el menú de consultas
+  if (bubble.style.display === 'block') {
+    closeGuideBubble();
+  } else {
+    showFAQMenu();
+  }
+}
+
+// Desplegar el menú de opciones de preguntas
+function showFAQMenu() {
+  const bubble = document.getElementById('guide-bubble');
+  
+  let html = `<div style="font-weight:bold; color:var(--neon-cyan); margin-bottom:8px; border-bottom:1px solid rgba(0,240,255,0.3); padding-bottom:4px; font-family:'Orbitron'; font-size:0.75rem;">🤖 CONSULTAS Y AYUDA</div>`;
+  html += `<div style="display:flex; flex-direction:column; gap:6px; max-height:180px; overflow-y:auto; padding-right:4px;">`;
+  
+  FAQ_DATA.forEach(item => {
+    html += `<button class="btn btn-sm" style="text-align:left; font-size:0.75rem; padding:6px 8px; text-transform:none; font-family:'Rajdhani';" onclick="showFAQAnswer(${item.id})">❓ ${item.question}</button>`;
+  });
+  
+  html += `</div>`;
+  html += `<div style="text-align:right; margin-top:8px;"><button class="btn btn-sm btn-danger" style="padding:2px 8px; font-size:0.65rem;" onclick="closeGuideBubble()">Cerrar ✖</button></div>`;
+  
+  bubble.innerHTML = html;
+  bubble.style.display = 'block';
+}
+
+// Mostrar la respuesta elegida con opción de volver
+function showFAQAnswer(id) {
+  const bubble = document.getElementById('guide-bubble');
+  const item = FAQ_DATA.find(q => q.id === id);
+  if (!item) return;
+
+  let html = `<div style="font-weight:bold; color:var(--neon-cyan); margin-bottom:6px; font-size:0.85rem;">${item.question}</div>`;
+  html += `<div style="font-size:0.8rem; line-height:1.35; margin-bottom:10px; color:#e0f7ff;">${item.answer}</div>`;
+  html += `<div style="display:flex; justify-content:space-between; gap:6px;">`;
+  html += `<button class="btn btn-sm" style="font-size:0.65rem; padding:4px 8px;" onclick="showFAQMenu()">🔙 Volver al menú</button>`;
+  html += `<button class="btn btn-sm btn-danger" style="font-size:0.65rem; padding:4px 8px;" onclick="closeGuideBubble()">Cerrar ✖</button>`;
+  html += `</div>`;
+
+  bubble.innerHTML = html;
+}
+
+function closeGuideBubble() {
+  document.getElementById('guide-bubble').style.display = 'none';
+}
+
+listenToDatabase();
+
+if (!currentUserId) {
+  buildAvatarGrid();
+}
+/* =====================================================
+ /* =====================================================
+   SISTEMA DE DUELOS Y CONTADOR DE LIGA (INTEGRADO FIREBASE)
+===================================================== */
+
+let duelState = {
+  p1Deck: 50,
+  p2Deck: 50,
+  gameStarted: false,
+  opponentId: null,
+  opponentName: 'Oponente'
+};
+
+// Abrir el modal de duelo (vincular oponente)
+function openDuelWithPlayer(targetPlayerId, targetPlayerName) {
+  duelState.opponentId = targetPlayerId || null;
+  duelState.opponentName = targetPlayerName || 'Oponente';
+  
+  const p2NameElem = document.getElementById('p2-name');
+  if (p2NameElem) {
+    p2NameElem.innerText = duelState.opponentName.toUpperCase();
+  }
+  
+  // Resetear estados a 50 cartas
+  duelState.p1Deck = 50;
+  duelState.p2Deck = 50;
+  duelState.gameStarted = false;
+  
+  const p1DeckElem = document.getElementById('p1-deck');
+  const p2DeckElem = document.getElementById('p2-deck');
+  if (p1DeckElem) p1DeckElem.innerText = 50;
+  if (p2DeckElem) p2DeckElem.innerText = 50;
+  
+  // Resetear el botón principal
+  const turnBtn = document.getElementById('btn-main-action');
+  if (turnBtn) {
+    turnBtn.innerHTML = '🎴 Robar Mano Inicial (-6)';
+    turnBtn.style.background = 'linear-gradient(45deg, #ff9900, #ff0055)';
+  }
+  
+  document.getElementById('duel-setup').style.display = 'block';
+  document.getElementById('duel-arena').style.display = 'none';
+  document.getElementById('duel-modal').style.display = 'flex';
+}
+
+// Generar código único de sala
+function generateRoomCode() {
+  const code = 'BK-' + Math.floor(1000 + Math.random() * 9000);
+  document.getElementById('room-code-input').value = code;
+}
+
+// Iniciar combate al ingresar el código
+function startDuelSession() {
+  const code = document.getElementById('room-code-input').value.trim();
+  if (!code) {
+    alert('Por favor ingresa o genera un código de sala.');
+    return;
+  }
+
+  document.getElementById('display-room-code').innerText = code;
+  document.getElementById('duel-setup').style.display = 'none';
+  document.getElementById('duel-arena').style.display = 'block';
+}
+
+// Control del botón transformable: Mano Inicial (-6) -> Nuevo Turno (-1)
+function handleMainActionButton() {
+  const turnBtn = document.getElementById('btn-main-action');
+
+  if (!duelState.gameStarted) {
+    // Primera vez: Descuenta mano inicial de 6 cartas a ambos
+    updateDeck('p1', -6);
+    updateDeck('p2', -6);
+    
+    duelState.gameStarted = true;
+
+    // Transformar el botón
+    turnBtn.innerHTML = '🔄 Nuevo Turno (-1 a ambos)';
+    turnBtn.style.background = 'linear-gradient(45deg, #00f0ff, #0055ff)';
+  } else {
+    // Turnos siguientes: Descuenta 1 carta de robo por turno a ambos
+    updateDeck('p1', -1);
+    updateDeck('p2', -1);
+  }
+}
+
+// Actualizar contadores de mazo (+ / -)
+function updateDeck(player, amount) {
+  if (player === 'p1') {
+    duelState.p1Deck = Math.max(0, duelState.p1Deck + amount);
+    document.getElementById('p1-deck').innerText = duelState.p1Deck;
+  } else {
+    duelState.p2Deck = Math.max(0, duelState.p2Deck + amount);
+    document.getElementById('p2-deck').innerText = duelState.p2Deck;
+  }
+
+  // Validar si la partida terminó
+  checkDuelEnd();
+}
+
+// Detectar cuando el mazo de alguien llega a 0
+function checkDuelEnd() {
+  if (duelState.p1Deck <= 0) {
+    alert('💥 ¡Tu mazo llegó a 0! Ha sido una Derrota.');
+    registerMatchResult('derrota');
+    closeDuelModal();
+  } else if (duelState.p2Deck <= 0) {
+    alert('🏆 ¡El mazo del oponente llegó a 0! ¡VICTORIA REGISTRADA!');
+    registerMatchResult('victoria');
+    closeDuelModal();
+  }
+}
+
+// Registrar resultado automático en Firebase Firestore
+async function registerMatchResult(result) {
+  if (!currentUserId) {
+    alert('No se detectó usuario activo para guardar los puntos.');
+    return;
+  }
+
+  // Localizar jugador actual en el arreglo global
+  let user = players.find(p => p.id === currentUserId);
+  if (!user) return;
+
+  if (result === 'victoria') {
+    user.wins = (user.wins || 0) + 1;
+  } else {
+    user.losses = (user.losses || 0) + 1;
+  }
+  
+  // Recalcular puntos con la fórmula oficial (+50 / -25)
+  recalculatePoints(user);
+
+  // Guardar cambio en la base de datos de Firebase
+  try {
+    await saveUserToCloud(user);
+
+    // Si hay un oponente vinculado registrado en el sistema, actualizar también su resultado opuesto
+    if (duelState.opponentId) {
+      let opponent = players.find(p => p.id === duelState.opponentId);
+      if (opponent) {
+        if (result === 'victoria') {
+          opponent.losses = (opponent.losses || 0) + 1;
+        } else {
+          opponent.wins = (opponent.wins || 0) + 1;
+        }
+        recalculatePoints(opponent);
+        await saveUserToCloud(opponent);
+      }
+    }
+    
+    showGuideMessage && showGuideMessage('¡Resultado del duelo guardado en la Liga!');
+  } catch (error) {
+    console.error("Error al registrar el resultado en Firebase:", error);
+  }
+}
+
+// Cerrar el modal de duelo
+function closeDuelModal() {
+  document.getElementById('duel-modal').style.display = 'none';
+}
+function renderRanking() {
+  const tbody = document.getElementById('rank-body');
+  if (!tbody) return;
+
+  const sorted = [...players].sort((a, b) => (b.points || 0) - (a.points || 0));
+  tbody.innerHTML = '';
+
+  sorted.forEach((p, i) => {
+    const rank = getRank(p.points || 0);
+    const tr = document.createElement('tr');
+    tr.className = 'rank-row-interactive';
+
+    // Evita abrir modal si hace clic en el botón de duelo
+    tr.onclick = (e) => {
+      if (!e.target.classList.contains('btn-duel')) {
+        openPlayerModal(p.id);
+      }
+    };
+
+    const isMe = p.id === currentUserId;
+
+    tr.innerHTML = `
+      <td>${i + 1}</td>
+      <td><img src="${p.avatar || AVATARS[0]}" class="player-avatar" alt="Avatar"></td>
+      <td><strong>${escapeHtml(p.nick || 'Brawler')}</strong><br><small style="opacity:0.5">${p.id}</small></td>
+      <td style="color:var(--neon-cyan); font-weight:600;">${p.points || 0}</td>
+      <td>${p.wins || 0}/${p.losses || 0}</td>
+      <td>
+        <span class="rank-badge ${rank.cls}">
+          <img src="${rank.badge}" class="rank-badge-img-table" alt="Badge">
+          <span>${rank.name}</span>
+        </span>
+      </td>
+      <td>
+        ${!isMe ? `<button class="btn btn-sm btn-duel" onclick="openDuelWithPlayer('${p.id}', '${escapeHtml(p.nick || 'Oponente')}')">⚔️</button>` : ''}
+      </td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+</script>
+</body>
+</html>
