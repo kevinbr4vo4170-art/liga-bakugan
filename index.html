@@ -57,12 +57,18 @@
   .app {
     position: relative;
     z-index: 1;
+    width: 100%;
     max-width: 480px;
     margin: 0 auto;
     min-height: 100vh;
+    min-height: 100dvh;
     display: flex;
     flex-direction: column;
     padding-bottom: 70px;
+  }
+
+  #main-app {
+    width: 100%;
   }
  
   /* HEADER */
@@ -90,6 +96,90 @@
   }
   .admin-toggle-btn:hover {
     background: rgba(0, 240, 255, 0.3);
+  }
+
+  /* CONTROL DE AUDIO */
+  .audio-fab {
+    position: absolute;
+    top: 10px;
+    left: 12px;
+    width: 34px;
+    height: 34px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: rgba(0, 240, 255, 0.1);
+    color: var(--neon-cyan);
+    font-size: 1rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 20;
+    transition: 0.2s;
+  }
+  .audio-fab:hover {
+    background: rgba(0, 240, 255, 0.3);
+  }
+  .audio-panel {
+    display: none;
+    position: absolute;
+    top: 48px;
+    left: 12px;
+    z-index: 30;
+    background: rgba(8, 12, 24, 0.96);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px;
+    width: 200px;
+    box-shadow: 0 0 20px rgba(0, 240, 255, 0.2);
+  }
+  .audio-panel.open {
+    display: block;
+  }
+  .audio-panel label {
+    font-size: 0.65rem;
+    margin-bottom: 6px;
+  }
+  .audio-panel input[type="range"] {
+    width: 100%;
+    margin-bottom: 10px;
+    accent-color: var(--neon-cyan);
+  }
+  .audio-panel .btn-sm {
+    width: 100%;
+    margin-bottom: 0;
+  }
+
+  /* FOOTER COMUNIDAD / DISCORD */
+  .community-footer {
+    margin: 8px 16px 24px;
+    padding: 14px 16px;
+    text-align: center;
+    background: rgba(10, 15, 30, 0.75);
+    border: 1px solid rgba(88, 101, 242, 0.45);
+    border-radius: 12px;
+    box-shadow: 0 0 16px rgba(88, 101, 242, 0.12);
+  }
+  .community-footer p {
+    font-size: 0.85rem;
+    line-height: 1.45;
+    opacity: 0.9;
+    margin-bottom: 10px;
+  }
+  .community-footer a {
+    display: inline-block;
+    padding: 8px 14px;
+    border-radius: 8px;
+    border: 1px solid #5865F2;
+    background: rgba(88, 101, 242, 0.2);
+    color: #c5caff;
+    text-decoration: none;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.7rem;
+    letter-spacing: 1px;
+  }
+  .community-footer a:hover {
+    background: rgba(88, 101, 242, 0.4);
   }
 
   .logo-title {
@@ -174,7 +264,7 @@
     margin-bottom: 14px;
     box-shadow: 0 0 20px rgba(0,240,255,0.08), inset 0 0 30px rgba(0,0,0,0.3);
     position: relative;
-    overflow: hidden;
+    overflow: visible;
   }
   .panel::before {
     content: "";
@@ -252,6 +342,107 @@
   .btn-danger:hover {
     background: rgba(255, 0, 85, 0.35);
     box-shadow: 0 0 15px rgba(255, 0, 85, 0.4);
+  }
+  
+  /* EDITORES DE TARJETAS BAKUGAN EN PERFIL */
+  .bakugan-team-container {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+
+  .baku-card-editor {
+    background: rgba(0, 15, 30, 0.7);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px;
+    box-shadow: inset 0 0 10px rgba(0, 240, 255, 0.05);
+  }
+
+  .baku-card-header {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.7rem;
+    color: var(--neon-cyan);
+    letter-spacing: 1px;
+    margin-bottom: 8px;
+  }
+
+  .baku-input-name {
+    margin-bottom: 8px !important;
+  }
+
+  .baku-stats-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 8px;
+  }
+
+  .baku-stat-field {
+    display: flex;
+    align-items: center;
+    background: rgba(0, 20, 40, 0.9);
+    border: 1px solid rgba(0, 240, 255, 0.25);
+    border-radius: 8px;
+    padding: 0 8px;
+  }
+
+  .baku-stat-field input {
+    border: none !important;
+    margin-bottom: 0 !important;
+    background: transparent !important;
+    padding: 8px 4px !important;
+    font-size: 0.9rem;
+  }
+
+  .baku-icon {
+    width: 24px;
+    height: 24px;
+    object-fit: contain;
+    filter: drop-shadow(0 0 4px var(--neon-cyan));
+  }
+
+  .baku-faction-label {
+    font-size: 0.65rem;
+    color: rgba(0, 240, 255, 0.7);
+    text-transform: uppercase;
+    margin-bottom: 6px;
+    letter-spacing: 0.5px;
+  }
+
+  .baku-faction-selector {
+    display: flex;
+    justify-content: space-between;
+    gap: 6px;
+    background: rgba(0, 10, 20, 0.5);
+    padding: 6px;
+    border-radius: 8px;
+    border: 1px solid rgba(0, 240, 255, 0.15);
+  }
+
+  .faction-opt {
+    width: 32px;
+    height: 32px;
+    object-fit: contain;
+    cursor: pointer;
+    opacity: 0.4;
+    transition: all 0.2s ease;
+    border-radius: 50%;
+    padding: 2px;
+  }
+
+  .faction-opt:hover {
+    opacity: 0.8;
+    transform: scale(1.1);
+  }
+
+  .faction-opt.selected {
+    opacity: 1;
+    transform: scale(1.15);
+    filter: drop-shadow(0 0 8px var(--neon-cyan));
+    background: rgba(0, 240, 255, 0.2);
+    border: 1px solid var(--neon-cyan);
   }
 
   /* PERSONAJE GUÍA */
@@ -382,22 +573,39 @@
   }
 
   /* RANKING Y ADMIN LIST */
+  .rank-scroll {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-x: contain;
+    margin: 0 -2px;
+    padding-bottom: 6px;
+  }
+  .rank-scroll::-webkit-scrollbar {
+    height: 4px;
+  }
+  .rank-scroll::-webkit-scrollbar-thumb {
+    background: rgba(0, 240, 255, 0.35);
+    border-radius: 4px;
+  }
   .rank-table {
     width: 100%;
+    min-width: 560px;
     border-collapse: collapse;
-    font-size: 0.85rem;
+    font-size: 0.8rem;
+    table-layout: auto;
   }
   .rank-table th {
     text-align: left;
-    padding: 8px 4px;
+    padding: 8px 6px;
     color: var(--neon-cyan);
     font-family: 'Orbitron', sans-serif;
-    font-size: 0.65rem;
-    letter-spacing: 1px;
+    font-size: 0.58rem;
+    letter-spacing: 0.5px;
     border-bottom: 1px solid var(--border);
+    white-space: nowrap;
   }
   .rank-table td {
-    padding: 10px 4px;
+    padding: 8px 6px;
     border-bottom: 1px solid rgba(0,240,255,0.1);
     vertical-align: middle;
   }
@@ -408,6 +616,33 @@
   .rank-row-interactive:hover {
     background: rgba(0, 240, 255, 0.12) !important;
   }
+
+  .rank-player-cell {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 120px;
+  }
+  .rank-avatar {
+    width: 36px;
+    height: 36px;
+    min-width: 36px;
+    object-fit: cover;
+    clip-path: polygon(30% 0%, 70% 0%, 100% 50%, 70% 100%, 30% 100%, 0% 50%);
+    background: rgba(0, 20, 40, 0.8);
+    border: 1px solid rgba(0, 240, 255, 0.35);
+  }
+  .rank-nick {
+    font-weight: 700;
+    font-size: 0.85rem;
+    white-space: nowrap;
+  }
+  .rank-id-short {
+    font-size: 0.58rem;
+    opacity: 0.5;
+    white-space: nowrap;
+  }
+
   .player-avatar, .avatar-opt {
     width: 48px;
     height: 48px;
@@ -418,17 +653,26 @@
   .rank-badge {
     display: inline-flex;
     align-items: center;
-    gap: 6px;
-    padding: 2px 8px;
+    gap: 4px;
+    padding: 3px 8px;
     border-radius: 4px;
     font-size: 0.65rem;
     font-weight: 600;
-    letter-spacing: 0.5px;
+    letter-spacing: 0.3px;
+    white-space: nowrap;
   }
   .rank-badge-img-table {
-    width: 24px;
-    height: 24px;
+    width: 18px;
+    height: 18px;
     object-fit: contain;
+    flex-shrink: 0;
+  }
+  .btn-duel {
+    width: auto !important;
+    padding: 5px 8px !important;
+    font-size: 0.6rem !important;
+    letter-spacing: 0.5px !important;
+    white-space: nowrap;
   }
   .rank-novato { background: #333; color: #aaa; }
   .rank-bronce { background: #5c3a1e; color: #e0a060; }
@@ -601,12 +845,16 @@
     color: #e0f7ff;
   }
   .news-img {
+    display: block;
     width: 100%;
-    max-height: 250px;
-    object-fit: cover;
+    max-width: 100%;
+    height: auto;
+    max-height: none;
+    object-fit: contain;
     border-radius: 8px;
     border: 1px solid var(--border);
-    margin-top: 8px;
+    margin-top: 10px;
+    background: rgba(0, 0, 0, 0.25);
   }
 
   /* ====== GLOSARIO ====== */
@@ -750,8 +998,110 @@
     transform: scale(1.1);
   }
 
-  @media (min-width: 500px) {
-    .app { max-width: 520px; }
+  /* ====== RESPONSIVE CELULAR / TABLET / PC ====== */
+  @media (max-width: 400px) {
+    .tab-btn {
+      font-size: 0.5rem;
+      letter-spacing: 0.3px;
+      padding: 10px 1px;
+    }
+    header h1 { font-size: 0.95rem; }
+    .logo-img { height: 52px; }
+    .content { padding: 10px; }
+    .panel { padding: 12px; }
+    .rank-avatar { width: 32px; height: 32px; min-width: 32px; }
+    .rank-nick { font-size: 0.78rem; }
+    .rank-badge { font-size: 0.52rem; padding: 2px 4px; }
+  }
+
+  @media (min-width: 600px) {
+    .app {
+      max-width: 640px;
+      box-shadow: 0 0 50px rgba(0, 240, 255, 0.06);
+    }
+    .tab-btn {
+      font-size: 0.72rem;
+      padding: 14px 6px;
+    }
+    .content { padding: 20px; }
+  }
+
+  @media (min-width: 900px) {
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+    }
+    .app {
+      max-width: 920px;
+      width: 100%;
+      margin: 16px auto;
+      min-height: calc(100vh - 32px);
+      border-radius: 18px;
+      border: 1px solid rgba(0, 240, 255, 0.18);
+      background: rgba(5, 8, 18, 0.55);
+      overflow: hidden;
+      box-shadow: 0 0 60px rgba(0, 240, 255, 0.1);
+    }
+    header {
+      padding: 18px 24px 10px;
+    }
+    header h1 { font-size: 1.4rem; }
+    .logo-img { height: 88px; }
+    .tab-btn {
+      font-size: 0.8rem;
+      letter-spacing: 1.5px;
+      padding: 16px 8px;
+    }
+    .content {
+      padding: 24px 28px;
+    }
+    .panel {
+      padding: 20px;
+    }
+    .rank-table {
+      font-size: 0.9rem;
+    }
+    .rank-avatar {
+      width: 44px;
+      height: 44px;
+      min-width: 44px;
+    }
+    .rank-nick { font-size: 0.95rem; }
+    .rank-badge {
+      font-size: 0.7rem;
+      padding: 3px 8px;
+    }
+    .rank-badge-img-table {
+      width: 22px;
+      height: 22px;
+    }
+    .btn-duel {
+      padding: 6px 12px !important;
+      font-size: 0.7rem !important;
+    }
+    .news-img {
+      max-height: 520px;
+    }
+    #guide-character {
+      right: max(16px, calc(50% - 460px - 16px));
+      bottom: 24px;
+    }
+  }
+
+  @media (min-width: 1200px) {
+    .app {
+      max-width: 1080px;
+    }
+    #guide-character {
+      right: max(16px, calc(50% - 540px - 20px));
+    }
+  }
+
+  @media (min-width: 1400px) {
+    .app {
+      max-width: 1200px;
+    }
   }
 </style>
 </head>
@@ -760,19 +1110,48 @@
 <!-- FONDO ANIMADO -->
 <div class="hex-bg"></div>
 
-<!-- ============ PANTALLA DE BIENVENIDA ============ -->
+<!-- ============ PANTALLA DE BIENVENIDA / LOGIN-REGISTRO ============ -->
 <div id="welcome-screen">
   <img src="Lady_fenne_04.png" alt="Guía" class="welcome-char" id="welcome-char-img"
        onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Ccircle cx=%2250%22 cy=%2250%22 r=%2248%22 fill=%22%23111%22 stroke=%22%23ff00aa%22 stroke-width=%223%22/%3E%3Ctext x=%2250%22 y=%2258%22 text-anchor=%22middle%22 fill=%22%23ff00aa%22 font-size=%2230%22%3E?%3C/text%3E%3C/svg%3E'">
 
   <div class="welcome-bubble" id="welcome-text">
     ¡Bienvenido Brawler a la <strong>Liga Bakugan</strong>!<br><br>
-    Por favor indica tu <strong>nombre o Nick-name</strong> para comenzar.
+    Inicia sesión o crea tu cuenta para guardar tu progreso.
   </div>
 
-  <div style="width:100%; max-width:300px;">
-    <input type="text" id="nick-input" placeholder="Tu Nick-name..." maxlength="20" />
-    <button class="btn" onclick="startRegistration()">ENTRAR A LA LIGA</button>
+  <div style="width:100%; max-width:320px;">
+    <!-- Tabs Login / Registro -->
+    <div style="display:flex; margin-bottom:12px; border:1px solid var(--border); border-radius:8px; overflow:hidden;">
+      <button id="btn-show-login" class="btn" style="border-radius:0; border:none; flex:1; background:rgba(0,240,255,0.25);" onclick="showAuthForm('login')">INICIAR SESIÓN</button>
+      <button id="btn-show-register" class="btn" style="border-radius:0; border:none; flex:1; background:transparent; color:rgba(0,240,255,0.5);" onclick="showAuthForm('register')">REGISTRARSE</button>
+    </div>
+
+    <!-- FORMULARIO LOGIN -->
+    <div id="form-login">
+      <label style="text-align:left;">Nick / Email / Teléfono</label>
+      <input type="text" id="login-identifier" placeholder="Tu nick, email o teléfono..." autocomplete="username" />
+      <label style="text-align:left;">Contraseña</label>
+      <input type="password" id="login-password" placeholder="Tu contraseña..." autocomplete="current-password" />
+      <button class="btn" onclick="doLogin()" style="margin-top:4px;">ENTRAR A LA LIGA</button>
+      <p id="login-error" style="color:#ff4477; font-size:0.8rem; margin-top:8px; display:none;"></p>
+    </div>
+
+    <!-- FORMULARIO REGISTRO -->
+    <div id="form-register" style="display:none;">
+      <label style="text-align:left;">Nick-name (único)</label>
+      <input type="text" id="reg-nick" placeholder="Tu Nick-name..." maxlength="20" autocomplete="username" />
+      <label style="text-align:left;">Email</label>
+      <input type="email" id="reg-email" placeholder="tu@email.com" autocomplete="email" />
+      <label style="text-align:left;">Teléfono (opcional)</label>
+      <input type="tel" id="reg-phone" placeholder="+54 9 11 ..." autocomplete="tel" />
+      <label style="text-align:left;">Contraseña (mín. 6 caracteres)</label>
+      <input type="password" id="reg-password" placeholder="Creá tu contraseña..." autocomplete="new-password" />
+      <label style="text-align:left;">Repetir Contraseña</label>
+      <input type="password" id="reg-password2" placeholder="Repetí la contraseña..." autocomplete="new-password" />
+      <button class="btn" onclick="doRegister()" style="margin-top:4px;">CREAR CUENTA</button>
+      <p id="register-error" style="color:#ff4477; font-size:0.8rem; margin-top:8px; display:none;"></p>
+    </div>
   </div>
 </div>
 
@@ -780,6 +1159,12 @@
 <div class="app" id="main-app" style="display:none;">
 
   <header>
+    <button class="audio-fab" id="audio-fab-btn" onclick="toggleAudioPanel()" title="Ajustes de sonido">🔊</button>
+    <div class="audio-panel" id="audio-panel">
+      <label>Volumen</label>
+      <input type="range" id="audio-volume" min="0" max="100" value="40" oninput="setMusicVolume(this.value)" />
+      <button class="btn btn-sm" id="audio-mute-btn" onclick="toggleMute()">🔇 Silenciar</button>
+    </div>
     <button class="admin-toggle-btn" onclick="promptAdminAccess()">⚙️ ADMIN</button>
     <div class="logo-title">
       <img src="LOGO-BAKUGAN.png" alt="Bakugan" class="logo-img" onerror="this.style.display='none'">
@@ -833,12 +1218,96 @@
         <label>Avatar (elige uno)</label>
         <div class="avatar-grid" id="avatar-grid"></div>
 
-        <label>Tus 3 Bakugan de equipo (Team Main)</label>
-        <input type="text" id="baku1" placeholder="Bakugan 1" />
-        <input type="text" id="baku2" placeholder="Bakugan 2" />
-        <input type="text" id="baku3" placeholder="Bakugan 3" />
+        <label style="margin-bottom: 10px; display: block;">Tus 3 Bakugan de equipo (Team Main)</label>
 
-        <button class="btn" onclick="saveProfile()">GUARDAR PERFIL</button>
+        <div class="bakugan-team-container">
+          <!-- BAKUGAN 1 -->
+          <div class="baku-card-editor" id="baku-card-1">
+            <div class="baku-card-header">BAKUGAN #1</div>
+            <input type="text" id="baku1-name" placeholder="Nombre del Bakugan..." class="baku-input-name" />
+            
+            <div class="baku-stats-row">
+              <div class="baku-stat-field">
+                <img src="simbolo_bpower.png" class="baku-icon" alt="B-Power" title="B-Power" />
+                <input type="number" id="baku1-bpower" placeholder="B-Power" />
+              </div>
+              <div class="baku-stat-field">
+                <img src="simbolo_dano.png" class="baku-icon" alt="Daño" title="Daño" />
+                <input type="number" id="baku1-damage" placeholder="Daño" />
+              </div>
+            </div>
+
+            <div class="baku-faction-label">Seleccionar Facción:</div>
+            <div class="baku-faction-selector" data-baku-index="1">
+              <img src="faccion_pyrus.png" data-faction="Pyrus" title="Pyrus" class="faction-opt" onclick="selectBakuganFaction(1, 'Pyrus', this)" />
+              <img src="faccion_aquos.png" data-faction="Aquos" title="Aquos" class="faction-opt" onclick="selectBakuganFaction(1, 'Aquos', this)" />
+              <img src="faccion_ventus.png" data-faction="Ventus" title="Ventus" class="faction-opt" onclick="selectBakuganFaction(1, 'Ventus', this)" />
+              <img src="faccion_aurelus.png" data-faction="Aurelus" title="Aurelus" class="faction-opt" onclick="selectBakuganFaction(1, 'Aurelus', this)" />
+              <img src="faccion_haos.png" data-faction="Haos" title="Haos" class="faction-opt" onclick="selectBakuganFaction(1, 'Haos', this)" />
+              <img src="faccion_darkus.png" data-faction="Darkus" title="Darkus" class="faction-opt" onclick="selectBakuganFaction(1, 'Darkus', this)" />
+            </div>
+            <input type="hidden" id="baku1-faction" value="" />
+          </div>
+
+          <!-- BAKUGAN 2 -->
+          <div class="baku-card-editor" id="baku-card-2">
+            <div class="baku-card-header">BAKUGAN #2</div>
+            <input type="text" id="baku2-name" placeholder="Nombre del Bakugan..." class="baku-input-name" />
+            
+            <div class="baku-stats-row">
+              <div class="baku-stat-field">
+                <img src="simbolo_bpower.png" class="baku-icon" alt="B-Power" title="B-Power" />
+                <input type="number" id="baku2-bpower" placeholder="B-Power" />
+              </div>
+              <div class="baku-stat-field">
+                <img src="simbolo_dano.png" class="baku-icon" alt="Daño" title="Daño" />
+                <input type="number" id="baku2-damage" placeholder="Daño" />
+              </div>
+            </div>
+
+            <div class="baku-faction-label">Seleccionar Facción:</div>
+            <div class="baku-faction-selector" data-baku-index="2">
+              <img src="faccion_pyrus.png" data-faction="Pyrus" title="Pyrus" class="faction-opt" onclick="selectBakuganFaction(2, 'Pyrus', this)" />
+              <img src="faccion_aquos.png" data-faction="Aquos" title="Aquos" class="faction-opt" onclick="selectBakuganFaction(2, 'Aquos', this)" />
+              <img src="faccion_ventus.png" data-faction="Ventus" title="Ventus" class="faction-opt" onclick="selectBakuganFaction(2, 'Ventus', this)" />
+              <img src="faccion_aurelus.png" data-faction="Aurelus" title="Aurelus" class="faction-opt" onclick="selectBakuganFaction(2, 'Aurelus', this)" />
+              <img src="faccion_haos.png" data-faction="Haos" title="Haos" class="faction-opt" onclick="selectBakuganFaction(2, 'Haos', this)" />
+              <img src="faccion_darkus.png" data-faction="Darkus" title="Darkus" class="faction-opt" onclick="selectBakuganFaction(2, 'Darkus', this)" />
+            </div>
+            <input type="hidden" id="baku2-faction" value="" />
+          </div>
+
+          <!-- BAKUGAN 3 -->
+          <div class="baku-card-editor" id="baku-card-3">
+            <div class="baku-card-header">BAKUGAN #3</div>
+            <input type="text" id="baku3-name" placeholder="Nombre del Bakugan..." class="baku-input-name" />
+            
+            <div class="baku-stats-row">
+              <div class="baku-stat-field">
+                <img src="simbolo_bpower.png" class="baku-icon" alt="B-Power" title="B-Power" />
+                <input type="number" id="baku3-bpower" placeholder="B-Power" />
+              </div>
+              <div class="baku-stat-field">
+                <img src="simbolo_dano.png" class="baku-icon" alt="Daño" title="Daño" />
+                <input type="number" id="baku3-damage" placeholder="Daño" />
+              </div>
+            </div>
+
+            <div class="baku-faction-label">Seleccionar Facción:</div>
+            <div class="baku-faction-selector" data-baku-index="3">
+              <img src="faccion_pyrus.png" data-faction="Pyrus" title="Pyrus" class="faction-opt" onclick="selectBakuganFaction(3, 'Pyrus', this)" />
+              <img src="faccion_aquos.png" data-faction="Aquos" title="Aquos" class="faction-opt" onclick="selectBakuganFaction(3, 'Aquos', this)" />
+              <img src="faccion_ventus.png" data-faction="Ventus" title="Ventus" class="faction-opt" onclick="selectBakuganFaction(3, 'Ventus', this)" />
+              <img src="faccion_aurelus.png" data-faction="Aurelus" title="Aurelus" class="faction-opt" onclick="selectBakuganFaction(3, 'Aurelus', this)" />
+              <img src="faccion_haos.png" data-faction="Haos" title="Haos" class="faction-opt" onclick="selectBakuganFaction(3, 'Haos', this)" />
+              <img src="faccion_darkus.png" data-faction="Darkus" title="Darkus" class="faction-opt" onclick="selectBakuganFaction(3, 'Darkus', this)" />
+            </div>
+            <input type="hidden" id="baku3-faction" value="" />
+          </div>
+        </div>
+
+        <button class="btn" onclick="saveProfile()" style="margin-top: 10px;">💾 GUARDAR PERFIL</button>
+        <button class="btn btn-danger" onclick="logout()" style="margin-top: 8px;">🚪 CERRAR SESIÓN</button>
       </div>
 
       <div class="panel">
@@ -860,21 +1329,22 @@
     <div class="section" id="sec-liga">
       <div class="panel">
         <h3 style="font-family:'Orbitron';color:var(--neon-cyan);margin-bottom:12px;font-size:0.9rem;">RANKING DE LA LIGA</h3>
-        <div style="overflow-x:auto;">
+        <div class="rank-scroll">
           <table class="rank-table">
             <thead>
               <tr>
                 <th>#</th>
-                <th></th>
-                <th>NICK</th>
-                <th>PUNTOS</th>
+                <th>JUGADOR</th>
+                <th>PTS</th>
                 <th>V/D</th>
                 <th>RANGO</th>
+                <th></th>
               </tr>
             </thead>
             <tbody id="rank-body"></tbody>
           </table>
         </div>
+        <p style="font-size:0.65rem; opacity:0.45; margin-top:6px; text-align:center;">← Deslizá para ver todo →</p>
       </div>
 
       <div class="panel">
@@ -1243,8 +1713,18 @@
       </div>
     </div>
 
+    <!-- COMUNIDAD / DISCORD -->
+    <div class="community-footer">
+      <p>Si querés unirte a nuestra comunidad y formar parte de nosotros, te invito a unirte a nuestro Discord:</p>
+      <a id="discord-link" href="https://discord.gg/TU_INVITE_AQUI" target="_blank" rel="noopener noreferrer">💬 (aquí va tu link de discord)</a>
+    </div>
+
   </div>
 </div>
+
+<!-- AUDIO DE FONDO -->
+<audio id="audio-lobby" src="sonido_lobby_bakugan.mp3" loop preload="auto"></audio>
+<audio id="audio-battle" src="sonido_pelea_bakugan01.mp3" loop preload="auto"></audio>
 
 <!-- ============ VENTANA MODAL FLOTANTE (PERFIL BRAWLER) ============ -->
 <div class="modal-overlay" id="player-modal-overlay" onclick="closePlayerModal(event)">
@@ -1281,75 +1761,116 @@
   </div>
 </div>
 
-<!-- FIREBASE SDK -->
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
-<!-- ===== PANEL / MODAL DE DUELO ===== -->
-<div id="duel-modal" class="modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:10000; justify-content:center; align-items:center;">
-  <div class="panel" style="max-width:400px; width:90%; border:1px solid var(--neon-cyan); box-shadow:0 0 20px rgba(0,240,255,0.3); text-align:center;">
-    
-    <h3 style="font-family:'Orbitron'; color:var(--neon-cyan); margin-bottom:15px;">⚔️ ARENA DE DUELO TCG</h3>
+<!-- ===== ARENA DE DUELO (PANTALLA COMPLETA) ===== -->
+<div id="duel-screen" style="display:none; position:fixed; inset:0; z-index:10000; background:#05050a; overflow-y:auto; padding:12px 12px 80px;">
+  <div style="max-width:480px; margin:0 auto;">
 
-    <!-- PASO 1: Vincular Sala -->
-    <div id="duel-setup">
-      <p style="font-size:0.85rem; margin-bottom:10px;">Crea una sala o ingresa el código del oponente para vincular la partida:</p>
-      
-      <div style="display:flex; gap:8px; margin-bottom:15px; justify-content:center;">
-        <button class="btn btn-sm" onclick="generateRoomCode()">🎲 Crear Código</button>
-      </div>
-
-      <input type="text" id="room-code-input" placeholder="Código de Sala (Ej: BK-1234)" style="width:100%; text-align:center; font-family:'Orbitron'; letter-spacing:2px; padding:8px; margin-bottom:15px; text-transform:uppercase;">
-
-      <button class="btn" style="width:100%;" onclick="startDuelSession()">🚀 INICIAR COMBATE</button>
-      <button class="btn btn-danger btn-sm" style="margin-top:10px; width:100%;" onclick="closeDuelModal()">Cancelar</button>
+    <!-- HEADER ARENA -->
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+      <div style="font-family:'Orbitron'; color:var(--neon-cyan); font-size:0.85rem;">⚔️ ARENA</div>
+      <div style="font-family:'Orbitron'; color:var(--neon-magenta); font-size:0.7rem;">SALA: <span id="display-room-code">---</span></div>
+      <button class="btn btn-sm btn-danger" onclick="leaveDuelRoom()">SALIR</button>
     </div>
 
-    <!-- PASO 2: HUD / Tablero de Contadores -->
+    <!-- ESTADO DE SALA (esperando rival) -->
+    <div id="duel-waiting" class="panel" style="text-align:center; display:none;">
+      <h3 style="font-family:'Orbitron'; color:var(--neon-cyan); margin-bottom:10px; font-size:0.9rem;">ESPERANDO RIVAL...</h3>
+      <p style="font-size:0.85rem; opacity:0.8; margin-bottom:12px;">Compartí el código con tu oponente para que se una.</p>
+      <div id="waiting-code" style="font-family:'Orbitron'; font-size:1.6rem; color:var(--neon-magenta); letter-spacing:3px; margin-bottom:12px;">---</div>
+      <p id="waiting-status" style="font-size:0.8rem; color:var(--neon-cyan);">1 / 2 jugadores conectados</p>
+    </div>
+
+    <!-- SETUP: crear o unirse -->
+    <div id="duel-setup" class="panel" style="text-align:center;">
+      <h3 style="font-family:'Orbitron'; color:var(--neon-cyan); margin-bottom:12px; font-size:0.9rem;">VINCULAR DUELO</h3>
+      <p style="font-size:0.8rem; opacity:0.8; margin-bottom:12px;">Creá una sala o ingresá el código del rival. El combate solo inicia cuando ambos estén conectados.</p>
+      <div style="display:flex; gap:8px; margin-bottom:12px; justify-content:center;">
+        <button class="btn btn-sm" onclick="createDuelRoom()">🎲 CREAR SALA</button>
+      </div>
+      <input type="text" id="room-code-input" placeholder="Código (ej: SALA-1234)" style="text-align:center; font-family:'Orbitron'; letter-spacing:2px; text-transform:uppercase;" />
+      <button class="btn" onclick="joinDuelRoom()">🚀 UNIRSE / ENTRAR</button>
+      <button class="btn btn-danger btn-sm" style="margin-top:10px;" onclick="closeDuelScreen()">Cancelar</button>
+      <p id="duel-setup-error" style="color:#ff4477; font-size:0.8rem; margin-top:8px; display:none;"></p>
+    </div>
+
+    <!-- COMBATE ACTIVO -->
     <div id="duel-arena" style="display:none;">
-      
-      <div style="font-family:'Orbitron'; color:var(--neon-magenta); font-size:0.8rem; margin-bottom:10px;">
-        SALA: <span id="display-room-code" style="color:var(--neon-cyan);">---</span>
-      </div>
 
-      <!-- Contadores de Vida / Deck -->
-      <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-bottom:15px;">
-        
-        <!-- Tú (Jugador 1) -->
-        <div style="background:rgba(0,240,255,0.05); padding:10px; border-radius:8px; border:1px solid rgba(0,240,255,0.2);">
-          <div style="font-size:0.75rem; color:var(--neon-cyan); margin-bottom:5px;">TU DECK</div>
-          <div id="p1-deck" style="font-family:'Orbitron'; font-size:2rem; font-weight:bold; color:#fff;">50</div>
-          
+      <!-- DECKS -->
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:14px;">
+        <div class="panel" style="padding:12px; text-align:center; margin-bottom:0;">
+          <div style="font-size:0.7rem; color:var(--neon-cyan); margin-bottom:4px;" id="my-name-label">TU DECK</div>
+          <div id="my-deck" style="font-family:'Orbitron'; font-size:2rem; font-weight:bold;">50</div>
           <div style="display:flex; gap:4px; justify-content:center; margin-top:8px;">
-            <button class="btn btn-sm btn-danger" onclick="updateDeck('p1', -1)">-1</button>
-            <button class="btn btn-sm btn-danger" onclick="updateDeck('p1', -5)">-5</button>
-            <button class="btn btn-sm" onclick="updateDeck('p1', 1)">+1</button>
+            <button class="btn btn-sm btn-danger" onclick="syncUpdateDeck(-1)">-1</button>
+            <button class="btn btn-sm btn-danger" onclick="syncUpdateDeck(-5)">-5</button>
+            <button class="btn btn-sm" onclick="syncUpdateDeck(1)">+1</button>
           </div>
         </div>
-
-        <!-- Oponente (Jugador 2) -->
-        <div style="background:rgba(255,0,85,0.05); padding:10px; border-radius:8px; border:1px solid rgba(255,0,85,0.2);">
-          <div style="font-size:0.75rem; color:var(--neon-magenta); margin-bottom:5px;" id="p2-name">OPONENTE</div>
-          <div id="p2-deck" style="font-family:'Orbitron'; font-size:2rem; font-weight:bold; color:#fff;">50</div>
-          
-          <div style="display:flex; gap:4px; justify-content:center; margin-top:8px;">
-            <button class="btn btn-sm btn-danger" onclick="updateDeck('p2', -1)">-1</button>
-            <button class="btn btn-sm btn-danger" onclick="updateDeck('p2', -5)">-5</button>
-            <button class="btn btn-sm" onclick="updateDeck('p2', 1)">+1</button>
-          </div>
+        <div class="panel" style="padding:12px; text-align:center; margin-bottom:0; border-color:var(--neon-magenta);">
+          <div style="font-size:0.7rem; color:var(--neon-magenta); margin-bottom:4px;" id="opp-name-label">RIVAL</div>
+          <div id="opp-deck" style="font-family:'Orbitron'; font-size:2rem; font-weight:bold;">50</div>
+          <div style="font-size:0.65rem; opacity:0.5; margin-top:8px;">(solo él lo modifica)</div>
         </div>
-
       </div>
 
-      <!-- Botón Dinámico (Mano Inicial -> Nuevo Turno) -->
-      <button id="btn-main-action" class="btn" style="width:100%; margin-bottom:10px; font-weight:bold; background:linear-gradient(45deg, #ff9900, #ff0055);" onclick="handleMainActionButton()">
+      <button id="btn-main-action" class="btn" style="margin-bottom:14px; font-weight:bold; background:linear-gradient(45deg,#ff9900,#ff0055);" onclick="handleMainActionButton()">
         🎴 Robar Mano Inicial (-6)
       </button>
 
-      <button class="btn btn-danger btn-sm" style="width:100%;" onclick="closeDuelModal()">Rendirse / Salir</button>
-    </div>
+      <!-- BAKUGAN EN CENTRO -->
+      <div class="panel" style="text-align:center; margin-bottom:14px;">
+        <div style="font-family:'Orbitron'; font-size:0.7rem; color:var(--neon-cyan); margin-bottom:8px;">BAKUGAN EN CAMPO</div>
+        <div id="arena-center-card" style="min-height:90px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:6px;">
+          <div style="opacity:0.5; font-size:0.85rem;">Seleccioná uno de tus Bakugan abajo</div>
+        </div>
+        <!-- Contadores B-Power / Daño del seleccionado -->
+        <div id="arena-stat-controls" style="display:none; margin-top:10px;">
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+            <div>
+              <div style="font-size:0.65rem; color:var(--neon-cyan);">B-POWER</div>
+              <div id="arena-bpower" style="font-family:'Orbitron'; font-size:1.4rem;">0</div>
+              <div style="display:flex; gap:4px; justify-content:center; margin-top:4px;">
+                <button class="btn btn-sm btn-danger" onclick="syncUpdateStat('bpower', -100)">-100</button>
+                <button class="btn btn-sm btn-danger" onclick="syncUpdateStat('bpower', -50)">-50</button>
+                <button class="btn btn-sm" onclick="syncUpdateStat('bpower', 50)">+50</button>
+                <button class="btn btn-sm" onclick="syncUpdateStat('bpower', 100)">+100</button>
+              </div>
+            </div>
+            <div>
+              <div style="font-size:0.65rem; color:var(--neon-magenta);">DAÑO</div>
+              <div id="arena-damage" style="font-family:'Orbitron'; font-size:1.4rem;">0</div>
+              <div style="display:flex; gap:4px; justify-content:center; margin-top:4px;">
+                <button class="btn btn-sm btn-danger" onclick="syncUpdateStat('damage', -1)">-1</button>
+                <button class="btn btn-sm btn-danger" onclick="syncUpdateStat('damage', -2)">-2</button>
+                <button class="btn btn-sm" onclick="syncUpdateStat('damage', 1)">+1</button>
+                <button class="btn btn-sm" onclick="syncUpdateStat('damage', 2)">+2</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
 
+      <!-- TUS 3 BAKUGAN -->
+      <div class="panel" style="margin-bottom:14px;">
+        <div style="font-family:'Orbitron'; font-size:0.7rem; color:var(--neon-cyan); margin-bottom:8px;">TU EQUIPO</div>
+        <div id="my-bakugan-list" style="display:flex; flex-direction:column; gap:6px;"></div>
+      </div>
+
+      <!-- RIVAL: Bakugan seleccionado (solo lectura) -->
+      <div class="panel" style="border-color:var(--neon-magenta);">
+        <div style="font-family:'Orbitron'; font-size:0.7rem; color:var(--neon-magenta); margin-bottom:8px;">BAKUGAN DEL RIVAL</div>
+        <div id="opp-bakugan-display" style="font-size:0.85rem; opacity:0.7;">Esperando selección...</div>
+      </div>
+
+    </div>
   </div>
 </div>
+
+<!-- FIREBASE SDK -->
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
 
 <script>
 const firebaseConfig = {
@@ -1364,6 +1885,7 @@ const firebaseConfig = {
 
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
+const auth = firebase.auth();
 
 const ADMIN_PIN = '4170';
 
@@ -1379,7 +1901,13 @@ const AVATARS = [
   'mantonoid_icon.jpg',
   'platinum_pharol_icon.jpg',
   'wrath_diamont_icon.jpg',
-  'serpillious_icon.jpg'
+  'serpillious_icon.jpg',
+  'griswing_icon.jpg',
+  'wrath_face_icon.jpg',
+  'darkus_krakelios_ultra_by_themrtusky.png',
+  'aurelus_leonidas_by_themrtusky.png',
+  'darkus_pyrus_tretorous_dragonoid_by_themrtusky.png',
+  'darkus_platinum_griswing_by_themrtusky.png'
 ];
 
 const GUIDE_POSES = [
@@ -1393,7 +1921,7 @@ const GUIDE_POSES = [
 
 const GUIDE_MINI = 'Lady_fenne_icono.png'; 
 
-let currentUserId = localStorage.getItem('bakugan_my_user_id') || null;
+let currentUserId = null;
 let selectedAvatarPath = AVATARS[0];
 let players = [];
 let newsList = [];
@@ -1407,18 +1935,12 @@ function listenToDatabase() {
   db.collection("players").onSnapshot((snapshot) => {
     players = [];
     snapshot.forEach((doc) => {
-      players.push(doc.data());
+      const data = doc.data();
+      if (!data.id) data.id = doc.id;
+      players.push(data);
     });
 
     renderRanking();
-
-    if (currentUserId && !isAppInitialized) {
-      let existingUser = players.find(p => p.id === currentUserId);
-      if (existingUser) {
-        isAppInitialized = true;
-        enterApp();
-      }
-    }
 
     if (currentUserId) {
       renderProfile();
@@ -1442,7 +1964,7 @@ function listenToDatabase() {
 }
 
 function saveUserToCloud(user) {
-  return db.collection("players").doc(user.id).set(user);
+  return db.collection("players").doc(user.id).set(user, { merge: true });
 }
 
 function recalculatePoints(player) {
@@ -1457,10 +1979,6 @@ function getRank(points) {
   if (points >= 500)  return { name: 'Plata', cls: 'rank-plata', badge: 'Insignea_plata_03.png' };
   if (points >= 200)  return { name: 'Bronce', cls: 'rank-bronce', badge: 'Insignea_bronce_02.png' };
   return { name: 'Novato', cls: 'rank-novato', badge: 'Insignea_Novato_01.png' };
-}
-
-function generateId() {
-  return 'BK-' + Math.random().toString(36).substr(2, 6).toUpperCase();
 }
 
 function buildAvatarGrid() {
@@ -1483,34 +2001,144 @@ function buildAvatarGrid() {
   });
 }
 
-async function startRegistration() {
-  const nick = document.getElementById('nick-input').value.trim();
-  if (!nick) {
-    alert('¡Escribe tu Nick-name!');
+/* ================= AUTH: LOGIN / REGISTRO ================= */
+function showAuthForm(mode) {
+  const loginForm = document.getElementById('form-login');
+  const regForm = document.getElementById('form-register');
+  const btnLogin = document.getElementById('btn-show-login');
+  const btnReg = document.getElementById('btn-show-register');
+
+  if (mode === 'login') {
+    loginForm.style.display = 'block';
+    regForm.style.display = 'none';
+    btnLogin.style.background = 'rgba(0,240,255,0.25)';
+    btnLogin.style.color = 'var(--neon-cyan)';
+    btnReg.style.background = 'transparent';
+    btnReg.style.color = 'rgba(0,240,255,0.5)';
+  } else {
+    loginForm.style.display = 'none';
+    regForm.style.display = 'block';
+    btnReg.style.background = 'rgba(0,240,255,0.25)';
+    btnReg.style.color = 'var(--neon-cyan)';
+    btnLogin.style.background = 'transparent';
+    btnLogin.style.color = 'rgba(0,240,255,0.5)';
+  }
+  document.getElementById('login-error').style.display = 'none';
+  document.getElementById('register-error').style.display = 'none';
+}
+
+function showAuthError(form, msg) {
+  const el = document.getElementById(form === 'login' ? 'login-error' : 'register-error');
+  el.textContent = msg;
+  el.style.display = 'block';
+}
+
+async function doRegister() {
+  const nick = document.getElementById('reg-nick').value.trim();
+  const email = document.getElementById('reg-email').value.trim().toLowerCase();
+  const phone = document.getElementById('reg-phone').value.trim();
+  const pass = document.getElementById('reg-password').value;
+  const pass2 = document.getElementById('reg-password2').value;
+
+  if (!nick || nick.length < 3) {
+    showAuthError('register', 'El nick debe tener al menos 3 caracteres.');
+    return;
+  }
+  if (!email || !email.includes('@')) {
+    showAuthError('register', 'Ingresá un email válido.');
+    return;
+  }
+  if (pass.length < 6) {
+    showAuthError('register', 'La contraseña debe tener mínimo 6 caracteres.');
+    return;
+  }
+  if (pass !== pass2) {
+    showAuthError('register', 'Las contraseñas no coinciden.');
     return;
   }
 
-  let user = players.find(p => p.nick && p.nick.toLowerCase() === nick.toLowerCase());
-  if (!user) {
-    user = {
-      id: generateId(),
-      nick: nick,
-      contact: '',
-      factions: [],
-      avatar: selectedAvatarPath || AVATARS[0],
-      bakugan: ['', '', ''],
-      wins: 0,
-      losses: 0,
-      points: 0
-    };
-  } else {
-    if (selectedAvatarPath) user.avatar = selectedAvatarPath;
+  const nickExists = players.some(p => p.nick && p.nick.toLowerCase() === nick.toLowerCase());
+  if (nickExists) {
+    showAuthError('register', 'Ese Nick-name ya está en uso. Elegí otro.');
+    return;
   }
 
-  currentUserId = user.id;
-  localStorage.setItem('bakugan_my_user_id', currentUserId);
-  await saveUserToCloud(user);
-  enterApp();
+  try {
+    const cred = await auth.createUserWithEmailAndPassword(email, pass);
+    const uid = cred.user.uid;
+
+    const user = {
+      id: uid,
+      nick: nick,
+      email: email,
+      contact: phone || email,
+      phone: phone || '',
+      factions: [],
+      avatar: AVATARS[0],
+      bakugan: [{}, {}, {}],
+      wins: 0,
+      losses: 0,
+      points: 0,
+      createdAt: Date.now()
+    };
+
+    await saveUserToCloud(user);
+  } catch (err) {
+    console.error(err);
+    let msg = 'Error al registrar.';
+    if (err.code === 'auth/email-already-in-use') msg = 'Ese email ya está registrado. Probá iniciar sesión.';
+    else if (err.code === 'auth/weak-password') msg = 'Contraseña demasiado débil.';
+    else if (err.code === 'auth/invalid-email') msg = 'Email inválido.';
+    showAuthError('register', msg);
+  }
+}
+
+async function doLogin() {
+  const identifier = document.getElementById('login-identifier').value.trim();
+  const pass = document.getElementById('login-password').value;
+
+  if (!identifier || !pass) {
+    showAuthError('login', 'Completá todos los campos.');
+    return;
+  }
+
+  try {
+    let emailToUse = null;
+
+    if (identifier.includes('@')) {
+      emailToUse = identifier.toLowerCase();
+    } else {
+      const snap = await db.collection('players').get();
+      let found = null;
+      snap.forEach(doc => {
+        const d = doc.data();
+        if (
+          (d.nick && d.nick.toLowerCase() === identifier.toLowerCase()) ||
+          (d.phone && d.phone.replace(/\s+/g, '') === identifier.replace(/\s+/g, '')) ||
+          (d.contact && d.contact.replace(/\s+/g, '') === identifier.replace(/\s+/g, ''))
+        ) {
+          found = d;
+        }
+      });
+
+      if (!found || !found.email) {
+        showAuthError('login', 'No se encontró ninguna cuenta con ese Nick, email o teléfono.');
+        return;
+      }
+      emailToUse = found.email;
+    }
+
+    await auth.signInWithEmailAndPassword(emailToUse, pass);
+  } catch (err) {
+    console.error(err);
+    let msg = 'Error al iniciar sesión.';
+    if (err.code === 'auth/user-not-found' || err.code === 'auth/wrong-password' || err.code === 'auth/invalid-credential') {
+      msg = 'Nick/Email/Teléfono o contraseña incorrectos.';
+    } else if (err.code === 'auth/too-many-requests') {
+      msg = 'Demasiados intentos. Esperá un momento.';
+    }
+    showAuthError('login', msg);
+  }
 }
 
 function enterApp() {
@@ -1521,19 +2149,142 @@ function enterApp() {
   renderRanking();
   renderNews();
   switchTab('perfil');
-  startGuide();
+  if (!guideFinished) startGuide();
+  playLobbyMusic();
+}
+
+function logout() {
+  if (confirm('¿Cerrar sesión?')) {
+    stopAllMusic();
+    auth.signOut();
+  }
+}
+
+/* ================= MÚSICA DE FONDO ================= */
+let musicMuted = localStorage.getItem('bakugan_music_muted') === '1';
+let musicVolume = parseInt(localStorage.getItem('bakugan_music_volume') || '40', 10);
+let musicUnlocked = false;
+let currentMusicMode = null; // 'lobby' | 'battle'
+
+function getLobbyAudio() { return document.getElementById('audio-lobby'); }
+function getBattleAudio() { return document.getElementById('audio-battle'); }
+
+function applyVolumeToAudios() {
+  const vol = musicMuted ? 0 : Math.max(0, Math.min(1, musicVolume / 100));
+  const lobby = getLobbyAudio();
+  const battle = getBattleAudio();
+  if (lobby) lobby.volume = vol;
+  if (battle) battle.volume = vol;
+  const fab = document.getElementById('audio-fab-btn');
+  if (fab) fab.textContent = musicMuted || musicVolume === 0 ? '🔇' : '🔊';
+  const muteBtn = document.getElementById('audio-mute-btn');
+  if (muteBtn) muteBtn.textContent = musicMuted ? '🔊 Activar sonido' : '🔇 Silenciar';
+  const slider = document.getElementById('audio-volume');
+  if (slider) slider.value = String(musicVolume);
+}
+
+function unlockMusic() {
+  if (musicUnlocked) return;
+  musicUnlocked = true;
+  // Intento silencioso para desbloquear autoplay en móviles
+  const a = getLobbyAudio();
+  if (a) {
+    a.play().then(() => {
+      if (currentMusicMode !== 'lobby') a.pause();
+    }).catch(() => {});
+  }
+}
+
+function stopAllMusic() {
+  const lobby = getLobbyAudio();
+  const battle = getBattleAudio();
+  if (lobby) { lobby.pause(); lobby.currentTime = 0; }
+  if (battle) { battle.pause(); battle.currentTime = 0; }
+  currentMusicMode = null;
+}
+
+function playLobbyMusic() {
+  applyVolumeToAudios();
+  const lobby = getLobbyAudio();
+  const battle = getBattleAudio();
+  if (battle) { battle.pause(); battle.currentTime = 0; }
+  currentMusicMode = 'lobby';
+  if (!lobby || musicMuted) return;
+  lobby.play().catch(() => {
+    // Autoplay bloqueado: se activará al primer toque
+  });
+}
+
+function playBattleMusic() {
+  applyVolumeToAudios();
+  const lobby = getLobbyAudio();
+  const battle = getBattleAudio();
+  if (lobby) { lobby.pause(); lobby.currentTime = 0; }
+  currentMusicMode = 'battle';
+  if (!battle || musicMuted) return;
+  battle.play().catch(() => {});
+}
+
+function setMusicVolume(val) {
+  musicVolume = parseInt(val, 10) || 0;
+  localStorage.setItem('bakugan_music_volume', String(musicVolume));
+  if (musicVolume > 0 && musicMuted) {
+    musicMuted = false;
+    localStorage.setItem('bakugan_music_muted', '0');
+  }
+  applyVolumeToAudios();
+  if (!musicMuted && currentMusicMode === 'lobby') playLobbyMusic();
+  if (!musicMuted && currentMusicMode === 'battle') playBattleMusic();
+}
+
+function toggleMute() {
+  musicMuted = !musicMuted;
+  localStorage.setItem('bakugan_music_muted', musicMuted ? '1' : '0');
+  applyVolumeToAudios();
+  if (musicMuted) {
+    const lobby = getLobbyAudio();
+    const battle = getBattleAudio();
+    if (lobby) lobby.pause();
+    if (battle) battle.pause();
+  } else if (currentMusicMode === 'battle') {
+    playBattleMusic();
+  } else {
+    playLobbyMusic();
+  }
+}
+
+function toggleAudioPanel() {
+  unlockMusic();
+  const panel = document.getElementById('audio-panel');
+  if (panel) panel.classList.toggle('open');
+}
+
+// Cerrar panel de audio al tocar afuera
+document.addEventListener('click', (e) => {
+  const panel = document.getElementById('audio-panel');
+  const fab = document.getElementById('audio-fab-btn');
+  if (!panel || !panel.classList.contains('open')) return;
+  if (panel.contains(e.target) || (fab && fab.contains(e.target))) return;
+  panel.classList.remove('open');
+});
+
+// Desbloquear audio con el primer toque en la página
+document.addEventListener('pointerdown', () => {
+  unlockMusic();
+  if (currentMusicMode === 'lobby') playLobbyMusic();
+  if (currentMusicMode === 'battle') playBattleMusic();
+}, { once: true });
+
+function selectBakuganFaction(bakuIndex, factionName, element) {
+  document.getElementById(`baku${bakuIndex}-faction`).value = factionName;
+  const container = element.parentElement;
+  container.querySelectorAll('.faction-opt').forEach(img => img.classList.remove('selected'));
+  element.classList.add('selected');
 }
 
 function renderProfile() {
   let user = players.find(p => p.id === currentUserId);
-  if (!user) {
-    user = {
-      id: currentUserId || generateId(),
-      nick: 'Brawler',
-      avatar: AVATARS[0],
-      points: 0, wins: 0, losses: 0, bakugan: ['','','']
-    };
-  }
+  if (!user) return;
 
   selectedAvatarPath = user.avatar || AVATARS[0];
   
@@ -1552,142 +2303,184 @@ function renderProfile() {
     });
   }
 
-  const baku = user.bakugan || ['', '', ''];
-  document.getElementById('baku1').value = baku[0] || '';
-  document.getElementById('baku2').value = baku[1] || '';
-  document.getElementById('baku3').value = baku[2] || '';
+  const bakuList = user.bakugan || [{}, {}, {}];
+  [1, 2, 3].forEach(i => {
+    const item = typeof bakuList[i - 1] === 'object' ? bakuList[i - 1] : { name: bakuList[i - 1] || '' };
+    document.getElementById(`baku${i}-name`).value = item.name || '';
+    document.getElementById(`baku${i}-bpower`).value = item.bpower || '';
+    document.getElementById(`baku${i}-damage`).value = item.damage || '';
+    
+    const faction = item.faction || '';
+    document.getElementById(`baku${i}-faction`).value = faction;
+    
+    const container = document.querySelector(`.baku-faction-selector[data-baku-index="${i}"]`);
+    if (container) {
+      container.querySelectorAll('.faction-opt').forEach(img => {
+        if (img.getAttribute('data-faction') === faction) {
+          img.classList.add('selected');
+        } else {
+          img.classList.remove('selected');
+        }
+      });
+    }
+  });
 
-  const rank = getRank(user.points || 0);
+  recalculatePoints(user);
+  const r = getRank(user.points || 0);
+
   document.getElementById('stat-points').textContent = user.points || 0;
-  document.getElementById('stat-rank').textContent = rank.name;
-  
-  const rankBadgeImg = document.getElementById('stat-rank-badge');
-  if (rankBadgeImg) rankBadgeImg.src = rank.badge;
-
   document.getElementById('stat-wins').textContent = user.wins || 0;
   document.getElementById('stat-losses').textContent = user.losses || 0;
-
-  buildAvatarGrid();
+  document.getElementById('stat-rank').textContent = r.name.toUpperCase();
+  
+  const badgeImg = document.getElementById('stat-rank-badge');
+  if (badgeImg) badgeImg.src = r.badge;
 }
 
 async function saveProfile() {
   let user = players.find(p => p.id === currentUserId);
-  if (!user) {
-    user = { id: currentUserId || generateId(), wins: 0, losses: 0, points: 0 };
-  }
+  if (!user) return;
 
   const newNick = document.getElementById('nick-edit-input').value.trim();
-  if (!newNick) {
-    alert('El Nickname no puede quedar vacío.');
-    return;
+  if (newNick && newNick !== user.nick) {
+    const taken = players.some(p => p.id !== currentUserId && p.nick && p.nick.toLowerCase() === newNick.toLowerCase());
+    if (taken) {
+      alert('Ese Nick-name ya está en uso por otro brawler.');
+      return;
+    }
+    user.nick = newNick;
   }
 
-  user.nick = newNick;
-  user.contact = document.getElementById('contact-input').value.trim();
-  user.avatar = selectedAvatarPath;
+  const contactVal = document.getElementById('contact-input').value.trim();
+  user.contact = contactVal;
+  if (contactVal && !contactVal.includes('@')) {
+    user.phone = contactVal;
+  }
 
   const sel = document.getElementById('faction-select');
   user.factions = Array.from(sel.selectedOptions).map(o => o.value);
-  
-  user.bakugan = [
-    document.getElementById('baku1').value.trim(),
-    document.getElementById('baku2').value.trim(),
-    document.getElementById('baku3').value.trim()
-  ];
+  user.avatar = selectedAvatarPath;
+
+  user.bakugan = [1, 2, 3].map(i => ({
+    name: document.getElementById(`baku${i}-name`).value.trim(),
+    bpower: document.getElementById(`baku${i}-bpower`).value,
+    damage: document.getElementById(`baku${i}-damage`).value,
+    faction: document.getElementById(`baku${i}-faction`).value
+  }));
 
   await saveUserToCloud(user);
-  showGuideMessage('¡Perfil actualizado en la nube, Brawler!');
+  alert('¡Perfil actualizado con éxito!');
 }
 
-/* =====================================================
-   RANKING Y VENTANA MODAL FLOTANTE
-===================================================== */
 function renderRanking() {
   const tbody = document.getElementById('rank-body');
   if (!tbody) return;
 
-  const sorted = [...players].sort((a, b) => (b.points || 0) - (a.points || 0));
-  tbody.innerHTML = '';
+  const sorted = [...players].sort((a, b) => {
+    recalculatePoints(a);
+    recalculatePoints(b);
+    return b.points - a.points;
+  });
 
-  sorted.forEach((p, i) => {
-    const rank = getRank(p.points || 0);
+  tbody.innerHTML = '';
+  sorted.forEach((p, index) => {
+    recalculatePoints(p);
+    const r = getRank(p.points || 0);
+    const isMe = p.id === currentUserId;
+
     const tr = document.createElement('tr');
     tr.className = 'rank-row-interactive';
-    tr.onclick = () => openPlayerModal(p.id); // Abre la tarjeta flotante
+    if (isMe) tr.style.background = 'rgba(0, 240, 255, 0.08)';
+
+    tr.onclick = (e) => {
+      if (!e.target.classList.contains('btn')) {
+        openPlayerModal(p);
+      }
+    };
+
+    const avatarSrc = p.avatar || (typeof AVATARS !== 'undefined' && AVATARS[0]) || 'dragonoid_diamante_icon.jpg';
+    const shortId = (p.id || '').length > 10 ? (p.id || '').slice(0, 6) + '…' : (p.id || '');
 
     tr.innerHTML = `
-      <td>${i + 1}</td>
-      <td><img src="${p.avatar || AVATARS[0]}" class="player-avatar" alt="Avatar"></td>
-      <td><strong>${escapeHtml(p.nick || 'Brawler')}</strong><br><small style="opacity:0.5">${p.id}</small></td>
-      <td style="color:var(--neon-cyan); font-weight:600;">${p.points || 0}</td>
-      <td>${p.wins || 0}/${p.losses || 0}</td>
+      <td style="font-family:'Orbitron'; font-weight:bold; font-size:0.75rem; color:var(--neon-cyan);">#${index + 1}</td>
       <td>
-        <span class="rank-badge ${rank.cls}">
-          <img src="${rank.badge}" class="rank-badge-img-table" alt="Badge">
-          <span>${rank.name}</span>
+        <div class="rank-player-cell">
+          <img src="${avatarSrc}" class="rank-avatar" alt=""
+               onerror="this.onerror=null;this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 40 40%22%3E%3Cpolygon points=%2212,2 28,2 38,20 28,38 12,38 2,20%22 fill=%22%230a1525%22 stroke=%22%2300f0ff%22 stroke-width=%221.5%22/%3E%3C/svg%3E';" />
+          <div style="min-width:0; flex:1;">
+            <div class="rank-nick" style="color:${isMe ? 'var(--neon-cyan)' : '#fff'};">${p.nick || 'Brawler'}</div>
+            <div class="rank-id-short">${shortId}</div>
+          </div>
+        </div>
+      </td>
+      <td style="font-family:'Orbitron'; font-weight:bold; color:var(--neon-cyan); font-size:0.85rem;">${p.points || 0}</td>
+      <td style="font-size:0.7rem; white-space:nowrap;">${p.wins || 0}V/${p.losses || 0}D</td>
+      <td>
+        <span class="rank-badge ${r.cls}">
+          <img src="${r.badge}" class="rank-badge-img-table" onerror="this.style.display='none'" />
+          ${r.name}
         </span>
+      </td>
+      <td style="text-align:right;">
+        <button class="btn btn-sm btn-duel" onclick="event.stopPropagation(); openDuelModal('${p.id}')">⚔️</button>
       </td>
     `;
     tbody.appendChild(tr);
   });
 }
 
-function openPlayerModal(playerId) {
-  const p = players.find(item => item.id === playerId);
-  if (!p) return;
+/* ================= VENTANA MODAL VER BRAWLER ================= */
+function openPlayerModal(player) {
+  recalculatePoints(player);
+  const r = getRank(player.points || 0);
 
-  const rank = getRank(p.points || 0);
+  document.getElementById('modal-avatar').src = player.avatar || AVATARS[0];
+  document.getElementById('modal-nick').textContent = player.nick || 'Brawler';
+  document.getElementById('modal-rank-img').src = r.badge;
+  document.getElementById('modal-rank-title').textContent = r.name.toUpperCase();
 
-  document.getElementById('modal-avatar').src = p.avatar || AVATARS[0];
-  document.getElementById('modal-nick').textContent = p.nick || 'Brawler';
-  document.getElementById('modal-rank-img').src = rank.badge;
-  
-  const rankTitle = document.getElementById('modal-rank-title');
-  rankTitle.textContent = rank.name;
-  rankTitle.style.color = rank.cls === 'rank-rey' ? '#ff00ff' : (rank.cls === 'rank-diamante' ? '#00e5ff' : '#00f0ff');
-
-  // Renderizar Bakugans
   const bakuContainer = document.getElementById('modal-bakugan-list');
   bakuContainer.innerHTML = '';
-  const bakugans = p.bakugan || [];
-  let hasBaku = false;
-  
-  bakugans.forEach((b, idx) => {
-    if (b && b.trim() !== '') {
-      hasBaku = true;
-      const div = document.createElement('div');
-      div.className = 'modal-bakugan-item';
-      div.textContent = `🐉 #${idx + 1}: ${b}`;
-      bakuContainer.appendChild(div);
-    }
-  });
 
-  if (!hasBaku) {
-    bakuContainer.innerHTML = '<div style="font-size:0.75rem; opacity:0.5;">Sin Bakugan registrados</div>';
+  const bakuList = player.bakugan || [];
+  if (bakuList.length === 0 || (!bakuList[0].name && !bakuList[1].name && !bakuList[2].name)) {
+    bakuContainer.innerHTML = `<div style="font-size:0.75rem; opacity:0.6;">Sin Bakugan registrados</div>`;
+  } else {
+    bakuList.forEach((b, idx) => {
+      if (b && (b.name || b.bpower || b.damage)) {
+        const item = document.createElement('div');
+        item.className = 'modal-bakugan-item';
+        item.innerHTML = `
+          <strong>#${idx + 1} ${b.name || 'Desconocido'}</strong> 
+          ${b.faction ? `(${b.faction})` : ''} 
+          <br> 
+          <span style="font-size:0.75rem; color:var(--neon-cyan);">⚡ ${b.bpower || 0} Gs | 💥 ${b.damage || 0} DMG</span>
+        `;
+        bakuContainer.appendChild(item);
+      }
+    });
   }
 
-  // Renderizar Facciones
   const facContainer = document.getElementById('modal-factions-list');
   facContainer.innerHTML = '';
-  const factions = p.factions || [];
-
-  if (factions.length > 0) {
-    factions.forEach(f => {
-      const span = document.createElement('span');
-      span.className = 'modal-faction-tag';
-      span.textContent = f;
-      facContainer.appendChild(span);
-    });
+  const facList = player.factions || [];
+  if (facList.length === 0) {
+    facContainer.innerHTML = `<div style="font-size:0.75rem; opacity:0.6;">Sin facciones seleccionadas</div>`;
   } else {
-    facContainer.innerHTML = '<div style="font-size:0.75rem; opacity:0.5;">Sin facciones seleccionadas</div>';
+    facList.forEach(f => {
+      const tag = document.createElement('span');
+      tag.className = 'modal-faction-tag';
+      tag.textContent = f;
+      facContainer.appendChild(tag);
+    });
   }
 
   document.getElementById('player-modal-overlay').classList.add('active');
 }
 
 function closePlayerModal(e) {
-  if (e.target.classList.contains('modal-overlay')) {
-    closePlayerModalDirect();
+  if (e.target.id === 'player-modal-overlay') {
+    document.getElementById('player-modal-overlay').classList.remove('active');
   }
 }
 
@@ -1695,225 +2488,21 @@ function closePlayerModalDirect() {
   document.getElementById('player-modal-overlay').classList.remove('active');
 }
 
-/* =====================================================
-   SISTEMA DE NOTICIAS
-===================================================== */
-function renderNews(listToRender = newsList) {
-  const container = document.getElementById('news-container');
-  if (!container) return;
-
-  if (listToRender.length === 0) {
-    container.innerHTML = '<p style="text-align:center; opacity:0.6; font-size:0.85rem;">No hay noticias que coincidan con la búsqueda.</p>';
-    return;
-  }
-
-  container.innerHTML = '';
-  listToRender.forEach(item => {
-    const card = document.createElement('div');
-    card.className = 'news-card';
-
-    let html = `<div class="news-title">${escapeHtml(item.title || 'Comunicado')}</div>`;
-    html += `<span class="news-date">${item.date || ''}</span>`;
-    html += `<div class="news-body">${escapeHtml(item.body || '')}</div>`;
-
-    if (item.image) {
-      html += `<img src="${item.image}" class="news-img" alt="Noticia" />`;
-    }
-
-    card.innerHTML = html;
-    container.appendChild(card);
-  });
-}
-
-function filterNews() {
-  const query = document.getElementById('news-search-input').value.toLowerCase().trim();
-  if (!query) {
-    renderNews(newsList);
-    return;
-  }
-  const filtered = newsList.filter(n => 
-    (n.title && n.title.toLowerCase().includes(query)) || 
-    (n.body && n.body.toLowerCase().includes(query))
-  );
-  renderNews(filtered);
-}
-
-document.getElementById('news-image-input')?.addEventListener('change', function(e) {
-  const file = e.target.files[0];
-  if (!file) return;
-
-  const reader = new FileReader();
-  reader.onload = function(event) {
-    const img = new Image();
-    img.onload = function() {
-      const canvas = document.createElement('canvas');
-      let width = img.width;
-      let height = img.height;
-      
-      const max_size = 800;
-      if (width > height) {
-        if (width > max_size) {
-          height *= max_size / width;
-          width = max_size;
-        }
-      } else {
-        if (height > max_size) {
-          width *= max_size / height;
-          height = max_size;
-        }
-      }
-      canvas.width = width;
-      canvas.height = height;
-      const ctx = canvas.getContext('2d');
-      ctx.drawImage(img, 0, 0, width, height);
-      
-      currentImageData = canvas.toDataURL('image/jpeg', 0.7);
-      document.getElementById('image-preview').src = currentImageData;
-      document.getElementById('image-preview-container').style.display = 'block';
-    }
-    img.src = event.target.result;
-  }
-  reader.readAsDataURL(file);
-});
-
-function removeNewsImage() {
-  currentImageData = "";
-  document.getElementById('news-image-input').value = "";
-  document.getElementById('image-preview-container').style.display = 'none';
-}
-
-async function saveNews() {
-  const newsId = document.getElementById('news-id').value;
-  const title = document.getElementById('news-title-input').value.trim();
-  const body = document.getElementById('news-body-input').value.trim();
-
-  if (!title || !body) {
-    alert('Por favor completa el título y el mensaje de la noticia.');
-    return;
-  }
-
-  const newsData = {
-    title: title,
-    body: body,
-    image: currentImageData,
-    date: new Date().toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }),
-    timestamp: Date.now()
-  };
-
-  try {
-    if (newsId) {
-      await db.collection("news").doc(newsId).update(newsData);
-      alert('¡Noticia actualizada exitosamente!');
-    } else {
-      await db.collection("news").add(newsData);
-      alert('¡Noticia publicada exitosamente!');
-    }
-    resetNewsForm();
-  } catch (error) {
-    console.error("Error al guardar la noticia: ", error);
-  }
-}
-
-function resetNewsForm() {
-  document.getElementById('news-id').value = '';
-  document.getElementById('news-title-input').value = '';
-  document.getElementById('news-body-input').value = '';
-  document.getElementById('news-form-title').textContent = 'PUBLICAR NOTICIA';
-  document.getElementById('cancel-news-btn').style.display = 'none';
-  removeNewsImage();
-}
-
-function editNews(id) {
-  const item = newsList.find(n => n.id === id);
-  if (!item) return;
-
-  document.getElementById('news-id').value = item.id;
-  document.getElementById('news-title-input').value = item.title || '';
-  document.getElementById('news-body-input').value = item.body || '';
-  document.getElementById('news-form-title').textContent = 'EDITAR NOTICIA';
-  document.getElementById('cancel-news-btn').style.display = 'inline-block';
-
-  if (item.image) {
-    currentImageData = item.image;
-    document.getElementById('image-preview').src = item.image;
-    document.getElementById('image-preview-container').style.display = 'block';
-  } else {
-    removeNewsImage();
-  }
-
-  document.getElementById('news-form-title').scrollIntoView({ behavior: 'smooth' });
-}
-
-async function deleteNews(id) {
-  if (!confirm('¿Estás seguro de que deseas eliminar esta noticia?')) return;
-  try {
-    await db.collection("news").doc(id).delete();
-  } catch (error) {
-    console.error("Error al eliminar noticia: ", error);
-  }
-}
-
-function renderAdminNewsList() {
-  const container = document.getElementById('admin-news-list');
-  if (!container) return;
-
-  if (newsList.length === 0) {
-    container.innerHTML = '<p style="font-size:0.8rem; opacity:0.6;">No hay noticias creadas.</p>';
-    return;
-  }
-
-  container.innerHTML = '';
-  newsList.forEach(item => {
-    const div = document.createElement('div');
-    div.style.background = 'rgba(0,10,25,0.6)';
-    div.style.border = '1px solid rgba(0,240,255,0.2)';
-    div.style.padding = '8px 12px';
-    div.style.borderRadius = '6px';
-    div.style.marginBottom = '8px';
-    div.style.display = 'flex';
-    div.style.justifyContent = 'space-between';
-    div.style.alignItems = 'center';
-
-    div.innerHTML = `
-      <div style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:60%;">
-        <strong>${escapeHtml(item.title)}</strong><br>
-        <small style="opacity:0.6">${item.date || ''}</small>
-      </div>
-      <div style="display:flex; gap:4px;">
-        <button class="btn btn-sm" onclick="editNews('${item.id}')">✏️ EDITAR</button>
-        <button class="btn btn-sm btn-danger" onclick="deleteNews('${item.id}')">🗑️ ELIMINAR</button>
-      </div>
-    `;
-    container.appendChild(div);
-  });
-}
-
-function escapeHtml(text) {
-  const div = document.createElement('div');
-  div.textContent = text;
-  return div.innerHTML;
-}
-
-/* =====================================================
-   ADMINISTRADOR
-===================================================== */
+/* ================= PANEL DE ADMINISTRACIÓN Y BORRADO DE USUARIOS ================= */
 function promptAdminAccess() {
   if (isAdminMode) {
-    alert('Ya te encuentras en Modo Administrador.');
     switchTab('admin');
     return;
   }
-
-  const pass = prompt('Ingrese el PIN de ADMINISTRADOR:');
-  if (pass === ADMIN_PIN) {
+  const pin = prompt('Introduce la Clave PIN del Administrador:');
+  if (pin === ADMIN_PIN) {
     isAdminMode = true;
     document.getElementById('tab-admin-btn').style.display = 'block';
+    switchTab('admin');
     renderAdminPanel();
     renderAdminNewsList();
-    switchTab('admin');
-    alert('¡Modo Game Master Activado!');
-  } else if (pass !== null) {
-    alert('PIN incorrecto. Acceso denegado.');
+  } else if (pin !== null) {
+    alert('Clave PIN Incorrecta.');
   }
 }
 
@@ -1922,91 +2511,271 @@ function renderAdminPanel() {
   if (!tbody) return;
 
   tbody.innerHTML = '';
-
-  players.forEach((p) => {
+  players.forEach(p => {
+    recalculatePoints(p);
     const tr = document.createElement('tr');
-
     tr.innerHTML = `
-      <td><strong>${escapeHtml(p.nick || 'Brawler')}</strong><br><small style="opacity:0.6">${p.id}</small></td>
-      <td>${p.wins || 0} V / ${p.losses || 0} D</td>
-      <td style="color:var(--neon-cyan);">${p.points || 0}</td>
-      <td style="display:flex; gap:4px; flex-wrap:wrap;">
-        <button class="btn btn-sm" onclick="adminMatchChange('${p.id}', 'win', 1)">+V</button>
-        <button class="btn btn-sm" onclick="adminMatchChange('${p.id}', 'win', -1)">-V</button>
-        <button class="btn btn-sm btn-danger" onclick="adminMatchChange('${p.id}', 'loss', 1)">+D</button>
-        <button class="btn btn-sm btn-danger" onclick="adminMatchChange('${p.id}', 'loss', -1)">-D</button>
-        <button class="btn btn-sm btn-danger" style="background:#ff0055; color:#fff;" onclick="deletePlayer('${p.id}', '${p.nick || 'Brawler'}')">🗑️</button>
+      <td>
+        <strong>${p.nick}</strong><br>
+        <span style="font-size:0.65rem; color:rgba(0,240,255,0.6);">${p.id}</span>
+      </td>
+      <td>${p.wins || 0} / ${p.losses || 0}</td>
+      <td style="color:var(--neon-cyan); font-weight:bold;">${p.points || 0}</td>
+      <td>
+        <div style="display:flex; gap:4px; flex-wrap:wrap;">
+          <button class="btn btn-sm" onclick="adjustStats('${p.id}', 1, 0)">+1 Vict</button>
+          <button class="btn btn-sm btn-danger" onclick="adjustStats('${p.id}', 0, 1)">+1 Derrot</button>
+          <button class="btn btn-sm btn-danger" style="background:#ff0033; color:#fff;" onclick="deletePlayer('${p.id}')">🗑️ ELIMINAR</button>
+        </div>
       </td>
     `;
     tbody.appendChild(tr);
   });
 }
 
-async function adminMatchChange(playerId, type, amount) {
-  const player = players.find(p => p.id === playerId);
-  if (!player) return;
-
-  if (type === 'win') {
-    player.wins = Math.max(0, (player.wins || 0) + amount);
-  } else if (type === 'loss') {
-    player.losses = Math.max(0, (player.losses || 0) + amount);
-  }
-
-  recalculatePoints(player);
-  await saveUserToCloud(player);
+async function adjustStats(userId, winsToAdd, lossesToAdd) {
+  const p = players.find(x => x.id === userId);
+  if (!p) return;
+  p.wins = (p.wins || 0) + winsToAdd;
+  p.losses = (p.losses || 0) + lossesToAdd;
+  recalculatePoints(p);
+  await saveUserToCloud(p);
 }
 
-async function deletePlayer(playerId, playerNick) {
-  if (!confirm(`⚠️ ¿Deseas eliminar permanentemente a "${playerNick}"?`)) return;
-  try {
-    await db.collection("players").doc(playerId).delete();
-  } catch (error) {
-    console.error("Error al eliminar usuario: ", error);
+async function deletePlayer(userId) {
+  const p = players.find(x => x.id === userId);
+  if (!p) return;
+
+  if (confirm(`¿Estás seguro de que deseas eliminar permanentemente al usuario ${p.nick}?`)) {
+    await db.collection("players").doc(userId).delete();
+    alert(`El usuario ${p.nick} ha sido eliminado.`);
   }
 }
 
 async function resetSeason() {
-  if (!confirm('⚠️ ¿Estás SEGURO de que deseas reiniciar la Liga Bakugan?')) return;
-  if (!confirm('🚨 ESTA ACCIÓN NO SE PUEDE DESHACER.')) return;
-
-  const batch = db.batch();
-  players.forEach(p => {
-    p.wins = 0;
-    p.losses = 0;
-    p.points = 0;
-    const docRef = db.collection("players").doc(p.id);
-    batch.update(docRef, { wins: 0, losses: 0, points: 0 });
-  });
-
-  await batch.commit();
-  alert('🔄 ¡La liga en la nube ha sido reiniciada a cero!');
+  if (confirm('⚠️ ATENCIÓN: ¿Estás seguro de reiniciar todos los puntos de la temporada a 0?')) {
+    const batch = db.batch();
+    players.forEach(p => {
+      p.wins = 0;
+      p.losses = 0;
+      p.points = 0;
+      const ref = db.collection("players").doc(p.id);
+      batch.update(ref, { wins: 0, losses: 0, points: 0 });
+    });
+    await batch.commit();
+    alert('¡Temporada reiniciada con éxito!');
+  }
 }
 
-/* =====================================================
-   NAVEGACIÓN DE PESTAÑAS
-===================================================== */
-function switchTab(tabName) {
-  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-
-  const targetBtn = document.querySelector(`.tab-btn[data-tab="${tabName}"]`);
-  const targetSec = document.getElementById('sec-' + tabName);
-
-  if (targetBtn) targetBtn.classList.add('active');
-  if (targetSec) targetSec.classList.add('active');
+/* ================= NOTICIAS Y PUBLICACIÓN ================= */
+function compressImageFile(file, maxWidth, quality) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onerror = () => reject(new Error('No se pudo leer la imagen'));
+    reader.onload = () => {
+      const img = new Image();
+      img.onerror = () => reject(new Error('Imagen inválida'));
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        let w = img.width;
+        let h = img.height;
+        const limit = maxWidth || 1000;
+        if (w > limit) {
+          h = Math.round((h * limit) / w);
+          w = limit;
+        }
+        canvas.width = w;
+        canvas.height = h;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, w, h);
+        // JPEG comprime mucho mejor que PNG para fotos
+        let dataUrl = canvas.toDataURL('image/jpeg', quality || 0.7);
+        // Si sigue grande, bajar calidad
+        if (dataUrl.length > 700000) {
+          dataUrl = canvas.toDataURL('image/jpeg', 0.5);
+        }
+        if (dataUrl.length > 900000) {
+          dataUrl = canvas.toDataURL('image/jpeg', 0.35);
+        }
+        resolve(dataUrl);
+      };
+      img.src = reader.result;
+    };
+    reader.readAsDataURL(file);
+  });
 }
 
-document.querySelectorAll('.tab-btn').forEach(btn => {
-  btn.addEventListener('click', () => {
-    switchTab(btn.dataset.tab);
+const imageInput = document.getElementById('news-image-input');
+if (imageInput) {
+  imageInput.addEventListener('change', async function(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    try {
+      currentImageData = await compressImageFile(file, 1000, 0.7);
+      document.getElementById('image-preview').src = currentImageData;
+      document.getElementById('image-preview-container').style.display = 'block';
+    } catch (err) {
+      console.error(err);
+      alert('No se pudo procesar la imagen. Probá con otra foto más liviana.');
+      removeNewsImage();
+    }
   });
-});
+}
 
-/* =====================================================
-   GUÍA DEL PERSONAJE Y MENÚ FAQ
-===================================================== */
+function removeNewsImage() {
+  currentImageData = "";
+  document.getElementById('news-image-input').value = "";
+  document.getElementById('image-preview-container').style.display = 'none';
+}
 
-// 1. Estructura de Preguntas y Respuestas (Modifica las preguntas/respuestas aquí en el futuro)
+async function saveNews() {
+  const title = document.getElementById('news-title-input').value.trim();
+  const body = document.getElementById('news-body-input').value.trim();
+  const newsId = document.getElementById('news-id').value;
+
+  if (!title || !body) {
+    alert('Por favor, ingresa un título y un contenido.');
+    return;
+  }
+
+  if (!auth.currentUser) {
+    alert('Tenés que estar logueado para publicar noticias. Cerrá admin, iniciá sesión y volvé a entrar al panel.');
+    return;
+  }
+
+  // Firestore limita ~1MB por documento; la imagen base64 no puede ser enorme
+  if (currentImageData && currentImageData.length > 900000) {
+    alert('La imagen sigue siendo demasiado pesada. Probá con una más chica o sin imagen.');
+    return;
+  }
+
+  const newsData = {
+    title,
+    body,
+    image: currentImageData || '',
+    timestamp: Date.now(),
+    authorId: auth.currentUser.uid
+  };
+
+  try {
+    if (newsId) {
+      await db.collection('news').doc(newsId).set(newsData, { merge: true });
+    } else {
+      await db.collection('news').add(newsData);
+    }
+    resetNewsForm();
+    alert('¡Noticia guardada exitosamente!');
+  } catch (e) {
+    console.error('Error al guardar noticia:', e);
+    let msg = 'No se pudo guardar la noticia.';
+    if (e && e.code === 'permission-denied') {
+      msg = 'Permiso denegado. Revisá las reglas de Firestore de la colección "news" (write solo si estás autenticado).';
+    } else if (e && (e.message || '').toLowerCase().includes('size')) {
+      msg = 'La noticia es demasiado grande (imagen). Usá una foto más liviana.';
+    } else if (e && e.message) {
+      msg += '\n' + e.message;
+    }
+    alert(msg);
+  }
+}
+
+function editNews(id) {
+  const item = newsList.find(n => n.id === id);
+  if (!item) return;
+
+  document.getElementById('news-id').value = item.id;
+  document.getElementById('news-title-input').value = item.title;
+  document.getElementById('news-body-input').value = item.body;
+  
+  if (item.image) {
+    currentImageData = item.image;
+    document.getElementById('image-preview').src = item.image;
+    document.getElementById('image-preview-container').style.display = 'block';
+  } else {
+    removeNewsImage();
+  }
+
+  document.getElementById('news-form-title').textContent = 'EDITAR NOTICIA';
+  document.getElementById('cancel-news-btn').style.display = 'inline-block';
+}
+
+async function deleteNews(id) {
+  if (confirm('¿Eliminar esta noticia?')) {
+    await db.collection("news").doc(id).delete();
+  }
+}
+
+function resetNewsForm() {
+  document.getElementById('news-id').value = '';
+  document.getElementById('news-title-input').value = '';
+  document.getElementById('news-body-input').value = '';
+  removeNewsImage();
+  document.getElementById('news-form-title').textContent = 'PUBLICAR NOTICIA';
+  document.getElementById('cancel-news-btn').style.display = 'none';
+}
+
+function renderNews(filterText = '') {
+  const container = document.getElementById('news-container');
+  if (!container) return;
+
+  const filtered = newsList.filter(n => 
+    n.title.toLowerCase().includes(filterText.toLowerCase()) || 
+    n.body.toLowerCase().includes(filterText.toLowerCase())
+  );
+
+  if (filtered.length === 0) {
+    container.innerHTML = `<p style="text-align:center; opacity:0.6;">No hay noticias disponibles.</p>`;
+    return;
+  }
+
+  container.innerHTML = '';
+  filtered.forEach(n => {
+    const card = document.createElement('div');
+    card.className = 'news-card';
+    const dateStr = new Date(n.timestamp).toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: 'numeric' });
+    card.innerHTML = `
+      <div class="news-title">${n.title}</div>
+      <span class="news-date">📅 ${dateStr}</span>
+      <div class="news-body">${n.body}</div>
+      ${n.image ? `<img src="${n.image}" class="news-img" />` : ''}
+    `;
+    container.appendChild(card);
+  });
+}
+
+function filterNews() {
+  const val = document.getElementById('news-search-input').value;
+  renderNews(val);
+}
+
+function renderAdminNewsList() {
+  const container = document.getElementById('admin-news-list');
+  if (!container) return;
+
+  if (newsList.length === 0) {
+    container.innerHTML = `<p style="font-size:0.8rem; opacity:0.6;">No hay noticias registradas.</p>`;
+    return;
+  }
+
+  container.innerHTML = '';
+  newsList.forEach(n => {
+    const item = document.createElement('div');
+    item.style.cssText = 'background:rgba(0,0,0,0.3); padding:8px; border-radius:6px; margin-bottom:8px; display:flex; justify-content:space-between; align-items:center;';
+    item.innerHTML = `
+      <div>
+        <strong style="color:var(--neon-cyan); font-size:0.85rem;">${n.title}</strong>
+      </div>
+      <div style="display:flex; gap:6px;">
+        <button class="btn btn-sm" onclick="editNews('${n.id}')">✏️ Editar</button>
+        <button class="btn btn-sm btn-danger" onclick="deleteNews('${n.id}')">🗑️ Borrar</button>
+      </div>
+    `;
+    container.appendChild(item);
+  });
+}
+
+/* ================= PERSONAJE GUÍA E INTERACCIÓN (FAQ MULTI) ================= */
+
 const FAQ_DATA = [
   {
     id: 1,
@@ -2016,7 +2785,7 @@ const FAQ_DATA = [
   {
     id: 2,
     question: "¿Cómo funciona la Arena de Duelo TCG?",
-    answer: "Presiona el botón de duelo (⚔️) en el Ranking, crea o ingresa un código de sala y usen el contador para descontar su mano inicial de 6 cartas y los robos por turno. ¡Al llegar un mazo a 0 se guardará el resultado automáticamente!"
+    answer: "Presioná ⚔️ en el Ranking, creá o ingresá un código de sala. El combate solo inicia cuando ambos jugadores están conectados. Los decks y Bakugan se sincronizan en tiempo real."
   },
   {
     id: 3,
@@ -2041,60 +2810,66 @@ const FAQ_DATA = [
   {
     id: 7,
     question: "¿Puedo cambiar mis Bakugan o Avatar?",
-    answer: "¡Sí! Ingresa a 'Perfil', elige un nuevo avatar, modifica tu equipo de 3 Bakugan o tus facciones y presiona 'GUARDAR PERFIL'."
+    answer: "¡Sí! Ingresá a 'Perfil', elegí un nuevo avatar, modificá tu equipo de 3 Bakugan o tus facciones y presioná 'GUARDAR PERFIL'."
   },
   {
     id: 8,
     question: "¿Cómo ver el perfil de otro jugador?",
-    answer: "Ve a la pestaña 'Liga' y haz clic directamente sobre el nombre o casilla de cualquier Brawler en la tabla de Ranking."
+    answer: "Andá a la pestaña 'Liga' y hacé clic directamente sobre el nombre o casilla de cualquier Brawler en la tabla de Ranking."
+  },
+  {
+    id: 9,
+    question: "¿Cómo inicio sesión o me registro?",
+    answer: "En la pantalla de bienvenida podés crear una cuenta con Nick + Email + Contraseña, o iniciar sesión usando tu Nick, Email o Teléfono junto con tu clave."
   }
 ];
-// Diálogo completo de presentación original
+
 const guideMessages = [
   '¡Genial que estés aquí, Brawler! Voy a mostrarte un poco la arena.',
-  'En <strong>Perfil</strong> puedes cambiar tu Nick cuando gustes, ver tu ID de jugador y tu contacto registrado.',
-  'También puedes seleccionar tus <strong>Facciones preferidas</strong>, cambiar tu ícono avatar y definir tus <strong>tres Bakugan de equipo</strong>.',
-  'En el apartado <strong>Liga</strong> verás tu posición en el Ranking, tus puntos acumulados y en qué rango te encuentras.',
-  'Revisa el apartado <strong>Noticias</strong> para enterarte de los próximos torneos, eventos y avisos importantes.',
-  'Si eres nuevo en el TCG, tienes un <strong>Glosario</strong> para consultar cuando gustes.',
-  '¡Listo! Ya conoces lo básico. Si necesitas recordar algo, tócalo o pulsa el <strong>?</strong>.'
+  'En <strong>Perfil</strong> podés cambiar tu Nick, ver tu ID, tu contacto y configurar tu equipo de 3 Bakugan.',
+  'También podés seleccionar tus <strong>Facciones preferidas</strong> y cambiar tu ícono avatar.',
+  'En el apartado <strong>Liga</strong> verás tu posición en el Ranking, tus puntos y en qué rango estás.',
+  'Revisá <strong>Noticias</strong> para enterarte de torneos, eventos y avisos importantes.',
+  'Si sos nuevo en el TCG, tenés un <strong>Glosario</strong> completo para consultar cuando quieras.',
+  '¡Listo! Ya conocés lo básico. Si necesitás ayuda, tocá mi ícono o el botón <strong>?</strong>.'
 ];
 
-// Iniciar la presentación completa una sola vez
 function startGuide() {
-  if (guideFinished) return; // Evita repetir el tour inicial si ya concluyó
+  if (guideFinished) return;
 
   guideStep = 0;
   const box = document.getElementById('char-box');
   const img = document.getElementById('guide-img');
-  
+
   if (box) box.classList.remove('mini');
   if (img) img.src = GUIDE_POSES[0];
-  document.getElementById('help-btn').style.display = 'none';
-  
+  const helpBtn = document.getElementById('help-btn');
+  if (helpBtn) helpBtn.style.display = 'none';
+
   showNextGuide();
 }
 
 function showNextGuide() {
   const bubble = document.getElementById('guide-bubble');
   const img = document.getElementById('guide-img');
+  if (!bubble) return;
 
   if (guideStep < guideMessages.length) {
     bubble.innerHTML = guideMessages[guideStep];
     bubble.style.display = 'block';
 
     const pose = GUIDE_POSES[guideStep] || GUIDE_POSES[0];
-    if (img) img.src = pose; 
+    if (img) img.src = pose;
 
     guideStep++;
 
     if (guideStep < guideMessages.length) {
-      setTimeout(showNextGuide, 5000); // 5 segundos por bocadillo
+      setTimeout(showNextGuide, 4500);
     } else {
       setTimeout(() => {
         bubble.style.display = 'none';
         finishGuide();
-      }, 5500);
+      }, 5000);
     }
   }
 }
@@ -2103,20 +2878,19 @@ function finishGuide() {
   guideFinished = true;
   const box = document.getElementById('char-box');
   const img = document.getElementById('guide-img');
-  
+
   if (box) box.classList.add('mini');
   if (img) img.src = GUIDE_MINI;
-  document.getElementById('help-btn').style.display = 'flex';
+  const helpBtn = document.getElementById('help-btn');
+  if (helpBtn) helpBtn.style.display = 'flex';
 }
 
-// Al hacer clic en Lady Fenne o el botón '?'
 function toggleGuideHelp() {
   const bubble = document.getElementById('guide-bubble');
-  
-  // Si la presentación inicial aún no termina, no interrumpe la secuencia
+  if (!bubble) return;
+
   if (!guideFinished) return;
 
-  // Si el bocadillo está abierto, lo cierra; si está cerrado, abre el menú de consultas
   if (bubble.style.display === 'block') {
     closeGuideBubble();
   } else {
@@ -2124,27 +2898,27 @@ function toggleGuideHelp() {
   }
 }
 
-// Desplegar el menú de opciones de preguntas
 function showFAQMenu() {
   const bubble = document.getElementById('guide-bubble');
-  
+  if (!bubble) return;
+
   let html = `<div style="font-weight:bold; color:var(--neon-cyan); margin-bottom:8px; border-bottom:1px solid rgba(0,240,255,0.3); padding-bottom:4px; font-family:'Orbitron'; font-size:0.75rem;">🤖 CONSULTAS Y AYUDA</div>`;
-  html += `<div style="display:flex; flex-direction:column; gap:6px; max-height:180px; overflow-y:auto; padding-right:4px;">`;
-  
+  html += `<div style="display:flex; flex-direction:column; gap:6px; max-height:200px; overflow-y:auto; padding-right:4px;">`;
+
   FAQ_DATA.forEach(item => {
-    html += `<button class="btn btn-sm" style="text-align:left; font-size:0.75rem; padding:6px 8px; text-transform:none; font-family:'Rajdhani';" onclick="showFAQAnswer(${item.id})">❓ ${item.question}</button>`;
+    html += `<button class="btn btn-sm" style="text-align:left; font-size:0.75rem; padding:6px 8px; text-transform:none; font-family:'Rajdhani'; letter-spacing:0;" onclick="showFAQAnswer(${item.id})">❓ ${item.question}</button>`;
   });
-  
+
   html += `</div>`;
   html += `<div style="text-align:right; margin-top:8px;"><button class="btn btn-sm btn-danger" style="padding:2px 8px; font-size:0.65rem;" onclick="closeGuideBubble()">Cerrar ✖</button></div>`;
-  
+
   bubble.innerHTML = html;
   bubble.style.display = 'block';
 }
 
-// Mostrar la respuesta elegida con opción de volver
 function showFAQAnswer(id) {
   const bubble = document.getElementById('guide-bubble');
+  if (!bubble) return;
   const item = FAQ_DATA.find(q => q.id === id);
   if (!item) return;
 
@@ -2159,215 +2933,440 @@ function showFAQAnswer(id) {
 }
 
 function closeGuideBubble() {
-  document.getElementById('guide-bubble').style.display = 'none';
+  const bubble = document.getElementById('guide-bubble');
+  if (bubble) bubble.style.display = 'none';
 }
 
-listenToDatabase();
+/* ================= NAVEGACIÓN ENTRE SECCIONES ================= */
+function switchTab(tabName) {
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.tab === tabName);
+  });
 
-if (!currentUserId) {
-  buildAvatarGrid();
-}
-/* =====================================================
- /* =====================================================
-   SISTEMA DE DUELOS Y CONTADOR DE LIGA (INTEGRADO FIREBASE)
-===================================================== */
+  document.querySelectorAll('.section').forEach(sec => {
+    sec.classList.remove('active');
+  });
 
-let duelState = {
-  p1Deck: 50,
-  p2Deck: 50,
-  gameStarted: false,
-  opponentId: null,
-  opponentName: 'Oponente'
-};
-
-// Abrir el modal de duelo (vincular oponente)
-function openDuelWithPlayer(targetPlayerId, targetPlayerName) {
-  duelState.opponentId = targetPlayerId || null;
-  duelState.opponentName = targetPlayerName || 'Oponente';
-  
-  const p2NameElem = document.getElementById('p2-name');
-  if (p2NameElem) {
-    p2NameElem.innerText = duelState.opponentName.toUpperCase();
-  }
-  
-  // Resetear estados a 50 cartas
-  duelState.p1Deck = 50;
-  duelState.p2Deck = 50;
-  duelState.gameStarted = false;
-  
-  const p1DeckElem = document.getElementById('p1-deck');
-  const p2DeckElem = document.getElementById('p2-deck');
-  if (p1DeckElem) p1DeckElem.innerText = 50;
-  if (p2DeckElem) p2DeckElem.innerText = 50;
-  
-  // Resetear el botón principal
-  const turnBtn = document.getElementById('btn-main-action');
-  if (turnBtn) {
-    turnBtn.innerHTML = '🎴 Robar Mano Inicial (-6)';
-    turnBtn.style.background = 'linear-gradient(45deg, #ff9900, #ff0055)';
-  }
-  
-  document.getElementById('duel-setup').style.display = 'block';
-  document.getElementById('duel-arena').style.display = 'none';
-  document.getElementById('duel-modal').style.display = 'flex';
+  const activeSec = document.getElementById(`sec-${tabName}`);
+  if (activeSec) activeSec.classList.add('active');
 }
 
-// Generar código único de sala
-function generateRoomCode() {
-  const code = 'BK-' + Math.floor(1000 + Math.random() * 9000);
-  document.getElementById('room-code-input').value = code;
+document.querySelectorAll('.tab-btn').forEach(btn => {
+  btn.addEventListener('click', () => switchTab(btn.dataset.tab));
+});
+
+/* ================= ARENA DE DUELO EN TIEMPO REAL ================= */
+let activeRoomCode = null;
+let duelUnsub = null;
+let duelRole = null; // 'host' | 'guest'
+let currentDuelData = null;
+let invitedOpponentId = null;
+
+function getMyPlayer() {
+  return players.find(p => p.id === currentUserId) || null;
 }
 
-// Iniciar combate al ingresar el código
-function startDuelSession() {
-  const code = document.getElementById('room-code-input').value.trim();
-  if (!code) {
-    alert('Por favor ingresa o genera un código de sala.');
-    return;
-  }
-
-  document.getElementById('display-room-code').innerText = code;
-  document.getElementById('duel-setup').style.display = 'none';
-  document.getElementById('duel-arena').style.display = 'block';
-}
-
-// Control del botón transformable: Mano Inicial (-6) -> Nuevo Turno (-1)
-function handleMainActionButton() {
-  const turnBtn = document.getElementById('btn-main-action');
-
-  if (!duelState.gameStarted) {
-    // Primera vez: Descuenta mano inicial de 6 cartas a ambos
-    updateDeck('p1', -6);
-    updateDeck('p2', -6);
-    
-    duelState.gameStarted = true;
-
-    // Transformar el botón
-    turnBtn.innerHTML = '🔄 Nuevo Turno (-1 a ambos)';
-    turnBtn.style.background = 'linear-gradient(45deg, #00f0ff, #0055ff)';
-  } else {
-    // Turnos siguientes: Descuenta 1 carta de robo por turno a ambos
-    updateDeck('p1', -1);
-    updateDeck('p2', -1);
-  }
-}
-
-// Actualizar contadores de mazo (+ / -)
-function updateDeck(player, amount) {
-  if (player === 'p1') {
-    duelState.p1Deck = Math.max(0, duelState.p1Deck + amount);
-    document.getElementById('p1-deck').innerText = duelState.p1Deck;
-  } else {
-    duelState.p2Deck = Math.max(0, duelState.p2Deck + amount);
-    document.getElementById('p2-deck').innerText = duelState.p2Deck;
-  }
-
-  // Validar si la partida terminó
-  checkDuelEnd();
-}
-
-// Detectar cuando el mazo de alguien llega a 0
-function checkDuelEnd() {
-  if (duelState.p1Deck <= 0) {
-    alert('💥 ¡Tu mazo llegó a 0! Ha sido una Derrota.');
-    registerMatchResult('derrota');
-    closeDuelModal();
-  } else if (duelState.p2Deck <= 0) {
-    alert('🏆 ¡El mazo del oponente llegó a 0! ¡VICTORIA REGISTRADA!');
-    registerMatchResult('victoria');
-    closeDuelModal();
-  }
-}
-
-// Registrar resultado automático en Firebase Firestore
-async function registerMatchResult(result) {
+function openDuelModal(targetUserId) {
   if (!currentUserId) {
-    alert('No se detectó usuario activo para guardar los puntos.');
+    alert('Tenés que iniciar sesión para duelar.');
+    return;
+  }
+  invitedOpponentId = targetUserId || null;
+  document.getElementById('duel-setup').style.display = 'block';
+  document.getElementById('duel-waiting').style.display = 'none';
+  document.getElementById('duel-arena').style.display = 'none';
+  document.getElementById('duel-setup-error').style.display = 'none';
+  document.getElementById('room-code-input').value = '';
+  document.getElementById('duel-screen').style.display = 'block';
+  document.getElementById('main-app').style.display = 'none';
+  playBattleMusic();
+}
+
+function closeDuelScreen() {
+  leaveDuelRoom(true);
+  document.getElementById('duel-screen').style.display = 'none';
+  if (currentUserId) {
+    document.getElementById('main-app').style.display = 'flex';
+  }
+  playLobbyMusic();
+}
+
+async function createDuelRoom() {
+  if (!currentUserId) return;
+  const me = getMyPlayer();
+  if (!me) {
+    alert('No se encontró tu perfil.');
     return;
   }
 
-  // Localizar jugador actual en el arreglo global
-  let user = players.find(p => p.id === currentUserId);
-  if (!user) return;
+  const code = 'SALA-' + Math.floor(1000 + Math.random() * 9000);
+  const room = {
+    hostId: currentUserId,
+    hostNick: me.nick || 'Brawler',
+    hostAvatar: me.avatar || AVATARS[0],
+    hostBakugan: me.bakugan || [{}, {}, {}],
+    hostDeck: 50,
+    hostSelected: null,
+    hostBpower: 0,
+    hostDamage: 0,
+    guestId: null,
+    guestNick: null,
+    guestAvatar: null,
+    guestBakugan: [],
+    guestDeck: 50,
+    guestSelected: null,
+    guestBpower: 0,
+    guestDamage: 0,
+    status: 'waiting',
+    initialDrawDone: false,
+    createdAt: Date.now()
+  };
 
-  if (result === 'victoria') {
-    user.wins = (user.wins || 0) + 1;
-  } else {
-    user.losses = (user.losses || 0) + 1;
-  }
-  
-  // Recalcular puntos con la fórmula oficial (+50 / -25)
-  recalculatePoints(user);
-
-  // Guardar cambio en la base de datos de Firebase
   try {
-    await saveUserToCloud(user);
-
-    // Si hay un oponente vinculado registrado en el sistema, actualizar también su resultado opuesto
-    if (duelState.opponentId) {
-      let opponent = players.find(p => p.id === duelState.opponentId);
-      if (opponent) {
-        if (result === 'victoria') {
-          opponent.losses = (opponent.losses || 0) + 1;
-        } else {
-          opponent.wins = (opponent.wins || 0) + 1;
-        }
-        recalculatePoints(opponent);
-        await saveUserToCloud(opponent);
-      }
-    }
-    
-    showGuideMessage && showGuideMessage('¡Resultado del duelo guardado en la Liga!');
-  } catch (error) {
-    console.error("Error al registrar el resultado en Firebase:", error);
+    await db.collection('duels').doc(code).set(room);
+    activeRoomCode = code;
+    duelRole = 'host';
+    document.getElementById('room-code-input').value = code;
+    document.getElementById('duel-setup').style.display = 'none';
+    document.getElementById('duel-waiting').style.display = 'block';
+    document.getElementById('waiting-code').textContent = code;
+    document.getElementById('display-room-code').textContent = code;
+    listenDuelRoom(code);
+  } catch (e) {
+    console.error(e);
+    showDuelError('No se pudo crear la sala. Revisá las reglas de Firestore (colección duels).');
   }
 }
 
-// Cerrar el modal de duelo
-function closeDuelModal() {
-  document.getElementById('duel-modal').style.display = 'none';
+async function joinDuelRoom() {
+  if (!currentUserId) return;
+  const code = document.getElementById('room-code-input').value.trim().toUpperCase();
+  if (!code) {
+    showDuelError('Ingresá un código de sala.');
+    return;
+  }
+
+  const me = getMyPlayer();
+  if (!me) {
+    showDuelError('No se encontró tu perfil.');
+    return;
+  }
+
+  try {
+    const ref = db.collection('duels').doc(code);
+    const snap = await ref.get();
+    if (!snap.exists) {
+      showDuelError('Esa sala no existe.');
+      return;
+    }
+    const data = snap.data();
+
+    // Si soy el host volviendo a entrar
+    if (data.hostId === currentUserId) {
+      activeRoomCode = code;
+      duelRole = 'host';
+      document.getElementById('duel-setup').style.display = 'none';
+      document.getElementById('display-room-code').textContent = code;
+      listenDuelRoom(code);
+      return;
+    }
+
+    // Si ya soy el guest
+    if (data.guestId === currentUserId) {
+      activeRoomCode = code;
+      duelRole = 'guest';
+      document.getElementById('duel-setup').style.display = 'none';
+      document.getElementById('display-room-code').textContent = code;
+      listenDuelRoom(code);
+      return;
+    }
+
+    // Sala llena
+    if (data.guestId && data.guestId !== currentUserId) {
+      showDuelError('La sala ya tiene 2 jugadores.');
+      return;
+    }
+
+    // Unirse como guest
+    await ref.update({
+      guestId: currentUserId,
+      guestNick: me.nick || 'Brawler',
+      guestAvatar: me.avatar || AVATARS[0],
+      guestBakugan: me.bakugan || [{}, {}, {}],
+      status: 'ready'
+    });
+
+    activeRoomCode = code;
+    duelRole = 'guest';
+    document.getElementById('duel-setup').style.display = 'none';
+    document.getElementById('duel-waiting').style.display = 'none';
+    document.getElementById('display-room-code').textContent = code;
+    listenDuelRoom(code);
+  } catch (e) {
+    console.error(e);
+    showDuelError('Error al unirse a la sala.');
+  }
 }
-function renderRanking() {
-  const tbody = document.getElementById('rank-body');
-  if (!tbody) return;
 
-  const sorted = [...players].sort((a, b) => (b.points || 0) - (a.points || 0));
-  tbody.innerHTML = '';
+function showDuelError(msg) {
+  const el = document.getElementById('duel-setup-error');
+  el.textContent = msg;
+  el.style.display = 'block';
+}
 
-  sorted.forEach((p, i) => {
-    const rank = getRank(p.points || 0);
-    const tr = document.createElement('tr');
-    tr.className = 'rank-row-interactive';
-
-    // Evita abrir modal si hace clic en el botón de duelo
-    tr.onclick = (e) => {
-      if (!e.target.classList.contains('btn-duel')) {
-        openPlayerModal(p.id);
-      }
-    };
-
-    const isMe = p.id === currentUserId;
-
-    tr.innerHTML = `
-      <td>${i + 1}</td>
-      <td><img src="${p.avatar || AVATARS[0]}" class="player-avatar" alt="Avatar"></td>
-      <td><strong>${escapeHtml(p.nick || 'Brawler')}</strong><br><small style="opacity:0.5">${p.id}</small></td>
-      <td style="color:var(--neon-cyan); font-weight:600;">${p.points || 0}</td>
-      <td>${p.wins || 0}/${p.losses || 0}</td>
-      <td>
-        <span class="rank-badge ${rank.cls}">
-          <img src="${rank.badge}" class="rank-badge-img-table" alt="Badge">
-          <span>${rank.name}</span>
-        </span>
-      </td>
-      <td>
-        ${!isMe ? `<button class="btn btn-sm btn-duel" onclick="openDuelWithPlayer('${p.id}', '${escapeHtml(p.nick || 'Oponente')}')">⚔️</button>` : ''}
-      </td>
-    `;
-    tbody.appendChild(tr);
+function listenDuelRoom(code) {
+  if (duelUnsub) {
+    duelUnsub();
+    duelUnsub = null;
+  }
+  duelUnsub = db.collection('duels').doc(code).onSnapshot((snap) => {
+    if (!snap.exists) {
+      alert('La sala fue cerrada.');
+      closeDuelScreen();
+      return;
+    }
+    currentDuelData = snap.data();
+    renderDuelUI(currentDuelData);
   });
 }
 
+function renderDuelUI(d) {
+  const bothReady = d.hostId && d.guestId;
+
+  if (!bothReady) {
+    document.getElementById('duel-waiting').style.display = 'block';
+    document.getElementById('duel-arena').style.display = 'none';
+    document.getElementById('waiting-code').textContent = activeRoomCode;
+    document.getElementById('waiting-status').textContent = '1 / 2 jugadores conectados';
+    return;
+  }
+
+  // Ambos conectados → arena
+  document.getElementById('duel-waiting').style.display = 'none';
+  document.getElementById('duel-setup').style.display = 'none';
+  document.getElementById('duel-arena').style.display = 'block';
+
+  const iAmHost = duelRole === 'host';
+  const myDeck = iAmHost ? d.hostDeck : d.guestDeck;
+  const oppDeck = iAmHost ? d.guestDeck : d.hostDeck;
+  const myNick = iAmHost ? d.hostNick : d.guestNick;
+  const oppNick = iAmHost ? d.guestNick : d.hostNick;
+  const myBaku = iAmHost ? (d.hostBakugan || []) : (d.guestBakugan || []);
+  const mySelected = iAmHost ? d.hostSelected : d.guestSelected;
+  const myBpower = iAmHost ? d.hostBpower : d.guestBpower;
+  const myDamage = iAmHost ? d.hostDamage : d.guestDamage;
+  const oppSelected = iAmHost ? d.guestSelected : d.hostSelected;
+  const oppBaku = iAmHost ? (d.guestBakugan || []) : (d.hostBakugan || []);
+  const oppBpower = iAmHost ? d.guestBpower : d.hostBpower;
+  const oppDamage = iAmHost ? d.guestDamage : d.hostDamage;
+
+  document.getElementById('my-name-label').textContent = (myNick || 'TÚ').toUpperCase() + ' · DECK';
+  document.getElementById('opp-name-label').textContent = (oppNick || 'RIVAL').toUpperCase() + ' · DECK';
+  document.getElementById('my-deck').textContent = myDeck ?? 50;
+  document.getElementById('opp-deck').textContent = oppDeck ?? 50;
+
+  // Botón mano inicial
+  const btn = document.getElementById('btn-main-action');
+  if (d.initialDrawDone) {
+    btn.textContent = '🔄 Nuevo Turno (-1 a ambos)';
+    btn.style.background = 'linear-gradient(45deg, #00f0ff, #0055ff)';
+  } else {
+    btn.textContent = '🎴 Robar Mano Inicial (-6)';
+    btn.style.background = 'linear-gradient(45deg, #ff9900, #ff0055)';
+  }
+
+  // Lista de mis Bakugan
+  const list = document.getElementById('my-bakugan-list');
+  list.innerHTML = '';
+  [0, 1, 2].forEach((i) => {
+    const b = myBaku[i] || {};
+    const name = b.name || `Bakugan #${i + 1}`;
+    const selected = mySelected === i;
+    const div = document.createElement('div');
+    div.style.cssText = `background:rgba(0,20,40,0.6); border:1px solid ${selected ? 'var(--neon-cyan)' : 'rgba(0,240,255,0.2)'}; border-radius:8px; padding:8px 10px; cursor:pointer; display:flex; justify-content:space-between; align-items:center;`;
+    if (selected) div.style.boxShadow = '0 0 12px rgba(0,240,255,0.35)';
+    div.innerHTML = `
+      <div>
+        <strong style="color:${selected ? 'var(--neon-cyan)' : '#fff'};">${name}</strong>
+        <span style="font-size:0.7rem; opacity:0.7; margin-left:6px;">${b.faction || ''}</span>
+        <div style="font-size:0.75rem; color:var(--neon-cyan);">⚡ ${b.bpower || 0} | 💥 ${b.damage || 0}</div>
+      </div>
+      <span style="font-size:0.7rem; color:var(--neon-magenta);">${selected ? 'EN CAMPO' : 'Elegir'}</span>
+    `;
+    div.onclick = () => selectMyBakugan(i);
+    list.appendChild(div);
+  });
+
+  // Centro: mi Bakugan seleccionado
+  const center = document.getElementById('arena-center-card');
+  const controls = document.getElementById('arena-stat-controls');
+  if (mySelected !== null && mySelected !== undefined && myBaku[mySelected]) {
+    const b = myBaku[mySelected];
+    center.innerHTML = `
+      <div style="font-family:'Orbitron'; font-size:1.1rem; color:var(--neon-cyan);">${b.name || 'Bakugan'}</div>
+      <div style="font-size:0.8rem; opacity:0.8;">${b.faction || 'Sin facción'}</div>
+      <div style="font-size:0.75rem; margin-top:4px;">Base: ⚡ ${b.bpower || 0} | 💥 ${b.damage || 0}</div>
+    `;
+    controls.style.display = 'block';
+    document.getElementById('arena-bpower').textContent = myBpower ?? (b.bpower || 0);
+    document.getElementById('arena-damage').textContent = myDamage ?? (b.damage || 0);
+  } else {
+    center.innerHTML = `<div style="opacity:0.5; font-size:0.85rem;">Seleccioná uno de tus Bakugan abajo</div>`;
+    controls.style.display = 'none';
+  }
+
+  // Rival seleccionado (solo lectura)
+  const oppBox = document.getElementById('opp-bakugan-display');
+  if (oppSelected !== null && oppSelected !== undefined && oppBaku[oppSelected]) {
+    const b = oppBaku[oppSelected];
+    oppBox.innerHTML = `
+      <strong style="color:var(--neon-magenta);">${b.name || 'Bakugan'}</strong>
+      <span style="opacity:0.7;"> (${b.faction || '?'})</span><br>
+      <span style="color:var(--neon-cyan);">⚡ ${oppBpower ?? b.bpower ?? 0}</span>
+      &nbsp;|&nbsp;
+      <span style="color:#ff6688;">💥 ${oppDamage ?? b.damage ?? 0}</span>
+    `;
+  } else {
+    oppBox.innerHTML = `<span style="opacity:0.6;">Esperando selección del rival...</span>`;
+  }
+
+  // Fin de partida por deck 0
+  if ((myDeck <= 0 || oppDeck <= 0) && d.status !== 'ended') {
+    handleDuelEnd(myDeck <= 0 ? 'loss' : 'win');
+  }
+}
+
+async function selectMyBakugan(index) {
+  if (!activeRoomCode || !duelRole) return;
+  const me = getMyPlayer();
+  const baku = (me && me.bakugan && me.bakugan[index]) ? me.bakugan[index] : {};
+  const baseB = parseInt(baku.bpower, 10) || 0;
+  const baseD = parseInt(baku.damage, 10) || 0;
+
+  const updates = duelRole === 'host'
+    ? { hostSelected: index, hostBpower: baseB, hostDamage: baseD }
+    : { guestSelected: index, guestBpower: baseB, guestDamage: baseD };
+
+  await db.collection('duels').doc(activeRoomCode).update(updates);
+}
+
+async function syncUpdateDeck(delta) {
+  if (!activeRoomCode || !duelRole || !currentDuelData) return;
+  const field = duelRole === 'host' ? 'hostDeck' : 'guestDeck';
+  const current = currentDuelData[field] ?? 50;
+  const next = Math.max(0, current + delta);
+  await db.collection('duels').doc(activeRoomCode).update({ [field]: next });
+}
+
+async function syncUpdateStat(stat, delta) {
+  if (!activeRoomCode || !duelRole || !currentDuelData) return;
+  const field = duelRole === 'host'
+    ? (stat === 'bpower' ? 'hostBpower' : 'hostDamage')
+    : (stat === 'bpower' ? 'guestBpower' : 'guestDamage');
+  const current = currentDuelData[field] ?? 0;
+  const next = Math.max(0, current + delta);
+  await db.collection('duels').doc(activeRoomCode).update({ [field]: next });
+}
+
+async function handleMainActionButton() {
+  if (!activeRoomCode || !currentDuelData) return;
+  const d = currentDuelData;
+
+  if (!d.initialDrawDone) {
+    await db.collection('duels').doc(activeRoomCode).update({
+      hostDeck: Math.max(0, (d.hostDeck ?? 50) - 6),
+      guestDeck: Math.max(0, (d.guestDeck ?? 50) - 6),
+      initialDrawDone: true
+    });
+  } else {
+    await db.collection('duels').doc(activeRoomCode).update({
+      hostDeck: Math.max(0, (d.hostDeck ?? 50) - 1),
+      guestDeck: Math.max(0, (d.guestDeck ?? 50) - 1)
+    });
+  }
+}
+
+async function handleDuelEnd(result) {
+  if (!activeRoomCode || !currentDuelData || currentDuelData.status === 'ended') return;
+  try {
+    await db.collection('duels').doc(activeRoomCode).update({ status: 'ended' });
+  } catch (e) {}
+
+  const me = getMyPlayer();
+  if (me) {
+    if (result === 'win') me.wins = (me.wins || 0) + 1;
+    else me.losses = (me.losses || 0) + 1;
+    recalculatePoints(me);
+    await saveUserToCloud(me);
+  }
+
+  alert(result === 'win' ? '🏆 ¡Victoria! Resultado guardado.' : '💥 Derrota. Resultado guardado.');
+  closeDuelScreen();
+}
+
+async function leaveDuelRoom(silent) {
+  if (duelUnsub) {
+    duelUnsub();
+    duelUnsub = null;
+  }
+  if (activeRoomCode && duelRole === 'host' && currentDuelData && !currentDuelData.guestId) {
+    // Host cancela sala vacía
+    try { await db.collection('duels').doc(activeRoomCode).delete(); } catch (e) {}
+  }
+  activeRoomCode = null;
+  duelRole = null;
+  currentDuelData = null;
+  if (!silent) {
+    document.getElementById('duel-screen').style.display = 'none';
+    if (currentUserId) document.getElementById('main-app').style.display = 'flex';
+    playLobbyMusic();
+  }
+}
+
+/* ================= INICIALIZACIÓN ================= */
+window.addEventListener('DOMContentLoaded', () => {
+  listenToDatabase();
+  applyVolumeToAudios();
+
+  // Escuchar cambios de autenticación (sesión persistente)
+  auth.onAuthStateChanged(async (user) => {
+    if (user) {
+      currentUserId = user.uid;
+      const doc = await db.collection('players').doc(user.uid).get();
+      if (doc.exists) {
+        const data = doc.data();
+        data.id = user.uid;
+        const idx = players.findIndex(p => p.id === user.uid);
+        if (idx === -1) players.push(data);
+        else players[idx] = data;
+      } else {
+        const basic = {
+          id: user.uid,
+          nick: user.email ? user.email.split('@')[0] : 'Brawler',
+          email: user.email || '',
+          contact: user.email || '',
+          phone: '',
+          factions: [],
+          avatar: AVATARS[0],
+          bakugan: [{}, {}, {}],
+          wins: 0,
+          losses: 0,
+          points: 0
+        };
+        await saveUserToCloud(basic);
+        players.push(basic);
+      }
+      isAppInitialized = true;
+      enterApp();
+    } else {
+      currentUserId = null;
+      isAppInitialized = false;
+      document.getElementById('welcome-screen').classList.remove('hidden');
+      document.getElementById('main-app').style.display = 'none';
+      showAuthForm('login');
+    }
+  });
+});
 </script>
 </body>
 </html>
